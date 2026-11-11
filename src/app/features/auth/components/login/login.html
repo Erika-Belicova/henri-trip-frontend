@@ -1,0 +1,57 @@
+<main>
+  <h1>Connexion</h1>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+    <div>
+      <label for="email">Adresse e-mail</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        required
+        [attr.aria-invalid]="submitted && loginForm.controls.email.invalid"
+        [attr.aria-describedby]="submitted && loginForm.controls.email.invalid ? 'email-error' : null"
+      />
+
+      @if (submitted && loginForm.controls.email.invalid) {
+        <span id="email-error">
+          @if (loginForm.controls.email.hasError('required')) {
+            L'adresse e-mail est obligatoire.
+          } @else if (loginForm.controls.email.hasError('email')) {
+            Veuillez saisir une adresse e-mail valide.
+          }
+        </span>
+      }
+    </div>
+
+    <div>
+      <label for="password">Mot de passe</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        required
+        [attr.aria-invalid]="submitted && loginForm.controls.password.invalid"
+        [attr.aria-describedby]="submitted && loginForm.controls.password.invalid ? 'password-error' : null"
+      />
+
+      @if (submitted && loginForm.controls.password.invalid) {
+        <span id="password-error">
+          Le mot de passe est obligatoire.
+        </span>
+      }
+    </div>
+
+    @if (errorMessage) {
+      <p role="alert">{{ errorMessage }}</p>
+    }
+
+    <button type="submit" [disabled]="isLoading">
+      {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+    </button>
+
+  </form>
+</main>
