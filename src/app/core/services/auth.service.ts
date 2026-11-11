@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TokenService } from './token.service';
-import { AuthResponse } from '../../shared/interfaces/auth-response';
+import { AuthResponseDTO } from '../../shared/interfaces/auth-response-dto';
 import { LoginRequestDTO } from '../../shared/interfaces/login-request-dto';
 import { UserResponseDTO } from '../../shared/interfaces/user-response-dto';
 import { UserRole } from '../../shared/enumerations/user-role';
@@ -23,8 +23,8 @@ export class AuthService {
   ) {}
 
   // authenticate and store the access token and the user returned by the API
-  login(credentials: LoginRequestDTO): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(
+  login(credentials: LoginRequestDTO): Observable<AuthResponseDTO> {
+    return this.http.post<AuthResponseDTO>(
       `${environment.apiUrl}/auth/login`, credentials
     ).pipe(
       tap(response => {
