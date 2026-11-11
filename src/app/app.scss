@@ -1,0 +1,33 @@
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.brand {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: inherit;
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.session a {
+  text-decoration: none;
+}
+
+.btn-logout {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.page {
+  padding: 1rem 2rem;
+}

@@ -9,10 +9,10 @@ import type { LoginRequestDTO } from '../../../../shared/interfaces/login-reques
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  templateUrl: './login.html',
+  styleUrl: './login.scss',
 })
-export class LoginComponent {
+export class Login {
 
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);

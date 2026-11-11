@@ -36,8 +36,7 @@ export class AuthService {
 
   // clear the session and go back to the login page
   logout(): void {
-    this.tokenService.clearTokens();
-    localStorage.removeItem(this.USER_KEY);
+    this.clearSession();
     this.router.navigate(['/login']);
   }
 
@@ -47,6 +46,7 @@ export class AuthService {
       const raw = localStorage.getItem(this.USER_KEY);
       return raw ? JSON.parse(raw) as UserResponseDTO : null;
     } catch {
+      localStorage.removeItem(this.USER_KEY);
       return null;
     }
   }
@@ -56,7 +56,17 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return this.tokenService.isAccessTokenValid();
+    const isValid = this.tokenService.isAccessTokenValid();
+    if (!isValid) { // if not valid clear session
+      this.clearSession();
+    }
+    return isValid;
+  }
+
+  // clear the access token and stored user information
+  clearSession(): void {
+    this.tokenService.clearToken();
+    localStorage.removeItem(this.USER_KEY);
   }
 
 }
