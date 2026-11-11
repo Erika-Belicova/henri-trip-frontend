@@ -44,7 +44,9 @@ export class Login {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
-          this.router.navigate(['/guides']);
+          this.router.navigate([
+            this.authService.isAdmin() ? '/admin' : '/guides'
+          ]);
         },
         error: (error: unknown) => {
           this.errorMessage = toErrorMessage(error);

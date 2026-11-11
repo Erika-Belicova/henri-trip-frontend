@@ -15,7 +15,13 @@ export const guestGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  return authService.isAuthenticated() ? router.createUrlTree(['/guides']) : true;
+  if (!authService.isAuthenticated()) {
+    return true;
+  }
+
+  return router.createUrlTree([
+    authService.isAdmin() ? '/admin' : '/guides'
+  ]);
 };
 
 // adminGuard to protect administrative routes
