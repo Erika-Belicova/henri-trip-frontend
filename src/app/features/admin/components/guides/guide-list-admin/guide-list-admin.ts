@@ -1,12 +1,13 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY, Subject, catchError, startWith, switchMap, tap } from 'rxjs';
+import { Subject, catchError, startWith, switchMap, map, of } from 'rxjs';
 
 import { GuideService } from '../../../../../core/services/guide.service';
 import { toErrorMessage } from '../../../../../core/error-message';
 import { GuideResponseDTO } from '../../../../../shared/interfaces/guide/guide-response-dto';
-import { Page } from '../../../../../shared/interfaces/page';
+import type { GuideListState } from '../../../../../shared/interfaces/guide/guide-list-state';
 
 import { TransportOption } from '../../../../../shared/enumerations/transport-option';
 import { SeasonOption } from '../../../../../shared/enumerations/season-option';
@@ -20,20 +21,14 @@ import {
 
 @Component({
   selector: 'app-guide-list-admin',
-  imports: [RouterLink],
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './guide-list-admin.html',
   styleUrl: './guide-list-admin.scss',
 })
-export class GuideListAdmin implements OnInit {
-
-  guides: GuideResponseDTO[] = [];
-  isLoading = true;
-  errorMessage = '';
+export class GuideListAdmin {
 
   currentPage = 0;
   pageSize = 20;
-  totalPages = 0;
-  totalElements = 0;
 
   searchQuery = '';
   selectedTransports = new Set<TransportOption>();
@@ -43,6 +38,7 @@ export class GuideListAdmin implements OnInit {
   transportLabels = TRANSPORT_LABELS;
   seasonLabels = SEASON_LABELS;
   audienceLabels = AUDIENCE_LABELS;
+
   transportOptions = TRANSPORT_OPTIONS;
   seasonOptions = SEASON_OPTIONS;
   audienceOptions = AUDIENCE_OPTIONS;
@@ -51,58 +47,52 @@ export class GuideListAdmin implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly reload$ = new Subject<void>();
 
-  ngOnInit(): void {
-    this.initializeGuideLoading();
-  }
+  // load guides automatically and whenever a reload is requested
+  readonly guideListState$ = this.reload$.pipe(
+    startWith(undefined),
 
-  // initialize the guide loading stream and manage its lifecycle
-  private initializeGuideLoading(): void {
-    this.reload$
-      .pipe(
-        startWith(undefined),
-        tap(() => this.setLoadingState()),
-        switchMap(() => this.fetchGuides()),
-        takeUntilDestroyed(this.destroyRef)
+    switchMap(() =>
+      this.guideService.getGuides(this.currentPage, this.pageSize).pipe(
+
+        // emit the successfully loaded guides and pagination information
+        map((page): GuideListState => ({
+          guides: page.content,
+          isLoading: false,
+          errorMessage: '',
+          totalPages: page.totalPages ?? 0,
+          totalElements: page.totalElements ?? 0
+        })),
+
+        // display the loading state while the request is running
+        startWith({
+          guides: [],
+          isLoading: true,
+          errorMessage: '',
+          totalPages: 0,
+          totalElements: 0
+        }),
+
+        // handle errors without terminating the reload stream
+        catchError((err: unknown) => of({
+          guides: [],
+          isLoading: false,
+          errorMessage: toErrorMessage(err),
+          totalPages: 0,
+          totalElements: 0
+        }))
       )
-      .subscribe();
-  }
+    ),
 
-  // reset the loading and error states before fetching guides
-  private setLoadingState(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-  }
-
-  // fetch the current page of guides and handle the response
-  private fetchGuides() {
-    return this.guideService
-      .getGuides(this.currentPage, this.pageSize)
-      .pipe(
-        tap((page: Page<GuideResponseDTO>) => this.updateGuides(page)),
-        catchError((err: unknown) => this.handleLoadingError(err))
-      );
-  }
-
-  // update the guide list and its pagination metadata
-  private updateGuides(page: Page<GuideResponseDTO>): void {
-    this.guides = page.content;
-    this.totalPages = page.totalPages ?? 0;
-    this.totalElements = page.totalElements ?? 0;
-    this.isLoading = false;
-  }
-
-  // handle request failures without terminating the reload stream
-  private handleLoadingError(err: unknown) {
-    this.errorMessage = toErrorMessage(err);
-    this.isLoading = false;
-    return EMPTY;
-  }
+    // automatically clean up when the component is destroyed
+    takeUntilDestroyed(this.destroyRef)
+  );
 
   // trigger a new request using the current pagination parameters
   loadGuides(): void {
     this.reload$.next();
   }
 
+  // move to the previous page and reload the guides
   previousPage(): void {
     if (this.currentPage > 0) {
       this.currentPage--;
@@ -110,18 +100,19 @@ export class GuideListAdmin implements OnInit {
     }
   }
 
-  nextPage(): void {
-    if (this.currentPage + 1 < this.totalPages) {
+  // move to the next page and reload the guides
+  nextPage(totalPages: number): void {
+    if (this.currentPage + 1 < totalPages) {
       this.currentPage++;
       this.loadGuides();
     }
   }
 
-  // search matches title or description; filters combine across groups
-  get filteredGuides(): GuideResponseDTO[] {
+  // filter guides by search text and selected filter options
+  filteredGuides(guides: GuideResponseDTO[]): GuideResponseDTO[] {
     const query = this.searchQuery.trim().toLowerCase();
 
-    return this.guides.filter((guide: GuideResponseDTO) =>
+    return guides.filter((guide: GuideResponseDTO) =>
       (query === '' ||
         guide.title.toLowerCase().includes(query) ||
         guide.description.toLowerCase().includes(query)) &&
@@ -134,6 +125,7 @@ export class GuideListAdmin implements OnInit {
     );
   }
 
+  // check whether any search or filter options are active
   get hasFilters(): boolean {
     return this.searchQuery.trim() !== '' ||
       this.selectedTransports.size > 0 ||
@@ -141,6 +133,7 @@ export class GuideListAdmin implements OnInit {
       this.selectedAudiences.size > 0;
   }
 
+  // update the search query when the user types
   onSearch(event: Event): void {
     this.searchQuery = (event.target as HTMLInputElement).value;
   }
@@ -154,6 +147,7 @@ export class GuideListAdmin implements OnInit {
     }
   }
 
+  // reset the search query and all selected filters
   clearFilters(): void {
     this.searchQuery = '';
     this.selectedTransports.clear();

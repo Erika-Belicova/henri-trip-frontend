@@ -56,55 +56,65 @@
     </button>
   }
 
-  @if (isLoading) {
-    <p>Loading guides...</p>
-  }
+  @if (guideListState$ | async; as state) {
 
-  @if (errorMessage) {
-    <p>{{ errorMessage }}</p>
-    <button type="button" (click)="loadGuides()">Retry</button>
-  }
-
-  @if (!isLoading && !errorMessage && guides.length === 0) {
-    <p>No guides have been created yet.</p>
-  }
-
-  @if (!isLoading && !errorMessage && guides.length > 0) {
-    <p>{{ filteredGuides.length }} guides</p>
-
-    @for (guide of filteredGuides; track guide.id) {
-      <article>
-        <h2>{{ guide.title }}</h2>
-        <p>{{ guide.description }}</p>
-        <p>{{ guide.numberOfDays }} days</p>
-
-        <a [routerLink]="['/admin/guides', guide.id]">
-          View guide
-        </a>
-      </article>
+    @if (state.isLoading) {
+      <p>Loading guides...</p>
     }
-  }
 
-  @if (!isLoading && !errorMessage && totalPages > 1) {
-    <nav aria-label="Guide pagination">
+    @if (state.errorMessage) {
+      <p>{{ state.errorMessage }}</p>
+      <button type="button" (click)="loadGuides()">Retry</button>
+    }
+
+    @if (!state.isLoading && !state.errorMessage && state.guides.length === 0) {
+      <p>No guides have been created yet.</p>
+    }
+
+    @if (!state.isLoading && !state.errorMessage && state.guides.length > 0) {
+
+      <!-- Calculate the filtered list once and reuse it below. -->
+      @let filtered = filteredGuides(state.guides);
+
+      <p>{{ filtered.length }} guides</p>
+
+      @for (guide of filtered; track guide.id) {
+        <article>
+          <h2>{{ guide.title }}</h2>
+          <p>{{ guide.description }}</p>
+          <p>{{ guide.numberOfDays }} days</p>
+
+          <a [routerLink]="['/admin/guides', guide.id]">
+            View guide
+          </a>
+        </article>
+      }
+    }
+
+    @if (!state.isLoading && !state.errorMessage && state.totalPages > 1) {
+      <nav aria-label="Guide pagination">
+
         <button
-        type="button"
-        [disabled]="currentPage === 0"
-        (click)="previousPage()">
-        Previous
+          type="button"
+          [disabled]="currentPage === 0"
+          (click)="previousPage()">
+          Previous
         </button>
 
         <span>
-        Page {{ currentPage + 1 }} / {{ totalPages }}
+          Page {{ currentPage + 1 }} / {{ state.totalPages }}
         </span>
 
         <button
-        type="button"
-        [disabled]="currentPage + 1 >= totalPages"
-        (click)="nextPage()">
-        Next
+          type="button"
+          [disabled]="currentPage + 1 >= state.totalPages"
+          (click)="nextPage(state.totalPages)">
+          Next
         </button>
-    </nav>
+
+      </nav>
+    }
+
   }
 
 </div>
