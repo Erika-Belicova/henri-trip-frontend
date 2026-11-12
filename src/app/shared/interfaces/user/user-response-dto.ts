@@ -1,4 +1,4 @@
-import { UserRole } from '../enumerations/user-role';
+import { UserRole } from '../../enumerations/user-role';
 
 export interface UserResponseDTO {
   id: number;

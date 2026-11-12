@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { toErrorMessage } from '../../../../core/error-message';
-import type { LoginRequestDTO } from '../../../../shared/interfaces/login-request-dto';
+import type { LoginRequestDTO } from '../../../../shared/interfaces/auth/login-request-dto';
 
 @Component({
   selector: 'app-login',
@@ -44,7 +44,9 @@ export class Login {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
-          this.router.navigate(['/guides']);
+          this.router.navigate([
+            this.authService.isAdmin() ? '/admin' : '/guides'
+          ]);
         },
         error: (error: unknown) => {
           this.errorMessage = toErrorMessage(error);

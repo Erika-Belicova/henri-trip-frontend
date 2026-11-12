@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TokenService } from './token.service';
-import { AuthResponseDTO } from '../../shared/interfaces/auth-response-dto';
-import { LoginRequestDTO } from '../../shared/interfaces/login-request-dto';
-import { UserResponseDTO } from '../../shared/interfaces/user-response-dto';
+import { AuthResponseDTO } from '../../shared/interfaces/auth/auth-response-dto';
+import { LoginRequestDTO } from '../../shared/interfaces/auth/login-request-dto';
+import { UserResponseDTO } from '../../shared/interfaces/user/user-response-dto';
 import { UserRole } from '../../shared/enumerations/user-role';
 
 @Injectable({

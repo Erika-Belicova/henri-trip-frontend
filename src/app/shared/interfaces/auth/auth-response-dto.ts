@@ -1,4 +1,4 @@
-import { UserResponseDTO } from './user-response-dto';
+import { UserResponseDTO } from '../user/user-response-dto';
 
 export interface AuthResponseDTO {
   accessToken: string;
