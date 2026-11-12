@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { GuideRequestDTO } from '../../shared/interfaces/guide/guide-request-dto';
+import { GuideUpdateRequestDTO } from '../../shared/interfaces/guide/guide-update-request-dto';
 import { GuideResponseDTO } from '../../shared/interfaces/guide/guide-response-dto';
 import { Page } from '../../shared/interfaces/page';
 
@@ -47,7 +48,7 @@ export class GuideService {
   // update a guide
   updateGuide(
     id: number,
-    request: GuideRequestDTO
+    request: GuideUpdateRequestDTO
   ): Observable<GuideResponseDTO> {
     return this.http.put<GuideResponseDTO>(
       `${this.apiUrl}/${id}`, request
