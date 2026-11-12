@@ -1,0 +1,110 @@
+<div class="list-container">
+
+  <header>
+    <h1>Guide Management</h1>
+    <a routerLink="/admin/guides/create">Create guide</a>
+  </header>
+
+  <input
+    class="search-input"
+    type="search"
+    placeholder="Search guides..."
+    aria-label="Search guides"
+    [value]="searchQuery"
+    (input)="onSearch($event)"
+  />
+
+  <div class="filter-group">
+    @for (option of transportOptions; track option) {
+      <button
+        type="button"
+        class="btn-filter"
+        [class.active]="selectedTransports.has(option)"
+        (click)="toggle(selectedTransports, option)">
+        {{ transportLabels[option] }}
+      </button>
+    }
+  </div>
+
+  <div class="filter-group">
+    @for (option of seasonOptions; track option) {
+      <button
+        type="button"
+        class="btn-filter"
+        [class.active]="selectedSeasons.has(option)"
+        (click)="toggle(selectedSeasons, option)">
+        {{ seasonLabels[option] }}
+      </button>
+    }
+  </div>
+
+  <div class="filter-group">
+    @for (option of audienceOptions; track option) {
+      <button
+        type="button"
+        class="btn-filter"
+        [class.active]="selectedAudiences.has(option)"
+        (click)="toggle(selectedAudiences, option)">
+        {{ audienceLabels[option] }}
+      </button>
+    }
+  </div>
+
+  @if (hasFilters) {
+    <button type="button" (click)="clearFilters()">
+      Clear filters
+    </button>
+  }
+
+  @if (isLoading) {
+    <p>Loading guides...</p>
+  }
+
+  @if (errorMessage) {
+    <p>{{ errorMessage }}</p>
+    <button type="button" (click)="loadGuides()">Retry</button>
+  }
+
+  @if (!isLoading && !errorMessage && guides.length === 0) {
+    <p>No guides have been created yet.</p>
+  }
+
+  @if (!isLoading && !errorMessage && guides.length > 0) {
+    <p>{{ filteredGuides.length }} guides</p>
+
+    @for (guide of filteredGuides; track guide.id) {
+      <article>
+        <h2>{{ guide.title }}</h2>
+        <p>{{ guide.description }}</p>
+        <p>{{ guide.numberOfDays }} days</p>
+
+        <a [routerLink]="['/admin/guides', guide.id]">
+          View guide
+        </a>
+      </article>
+    }
+  }
+
+  @if (!isLoading && !errorMessage && totalPages > 1) {
+    <nav aria-label="Guide pagination">
+        <button
+        type="button"
+        [disabled]="currentPage === 0"
+        (click)="previousPage()">
+        Previous
+        </button>
+
+        <span>
+        Page {{ currentPage + 1 }} / {{ totalPages }}
+        </span>
+
+        <button
+        type="button"
+        [disabled]="currentPage + 1 >= totalPages"
+        (click)="nextPage()">
+        Next
+        </button>
+    </nav>
+  }
+
+</div>
