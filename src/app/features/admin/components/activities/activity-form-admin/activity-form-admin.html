@@ -1,0 +1,93 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+  <h3>Nouvelle activité</h3>
+
+  @if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  }
+
+  <label for="activity-title">Titre</label>
+  <input
+    id="activity-title"
+    type="text"
+    formControlName="title">
+
+  @if (form.controls.title.touched && form.controls.title.invalid) {
+    <p class="field-error">
+      Le titre est obligatoire (200 caractères maximum).
+    </p>
+  }
+
+  <label for="activity-description">Description</label>
+  <textarea
+    id="activity-description"
+    formControlName="description">
+  </textarea>
+
+  @if (form.controls.description.touched && form.controls.description.invalid) {
+    <p class="field-error">
+      La description est obligatoire (5000 caractères maximum).
+    </p>
+  }
+
+  <label for="activity-category">Catégorie</label>
+  <select id="activity-category" formControlName="category">
+    <option [ngValue]="null" disabled>Choisir une catégorie</option>
+
+    @for (category of categoryOptions; track category) {
+      <option [ngValue]="category">
+        {{ categoryLabels[category] }}
+      </option>
+    }
+  </select>
+
+  @if (form.controls.category.touched && form.controls.category.invalid) {
+    <p class="field-error">
+      Veuillez sélectionner une catégorie.
+    </p>
+  }
+
+  <label for="activity-address">Adresse</label>
+  <input
+    id="activity-address"
+    type="text"
+    formControlName="address">
+
+  @if (form.controls.address.touched && form.controls.address.invalid) {
+    <p class="field-error">
+      L'adresse est obligatoire (500 caractères maximum).
+    </p>
+  }
+
+  <label for="activity-phone">Téléphone (facultatif)</label>
+  <input
+    id="activity-phone"
+    type="tel"
+    formControlName="phoneNumber">
+
+  <label for="activity-hours">Horaires d'ouverture (facultatif)</label>
+  <input
+    id="activity-hours"
+    type="text"
+    formControlName="openingHours">
+
+  <label for="activity-website">Site internet (facultatif)</label>
+  <input
+    id="activity-website"
+    type="url"
+    formControlName="website">
+
+  <div class="form-actions">
+    <button type="submit" [disabled]="isSaving">
+      {{ isSaving ? 'Enregistrement...' : 'Ajouter l’activité' }}
+    </button>
+
+    <button
+      type="button"
+      [disabled]="isSaving"
+      (click)="cancel()">
+      Annuler
+    </button>
+  </div>
+
+</form>

@@ -35,8 +35,9 @@ export class GuideDetailAdmin {
   isDeleting = false;
   deleteErrorMessage = '';
 
-  // retrieve the guide ID from the route and load the corresponding guide
-  readonly guideState$ = of(this.route.snapshot.paramMap.get('id')).pipe(
+  // retrieve the guide ID from route changes and load the corresponding guide
+  readonly guideState$ = this.route.paramMap.pipe(
+    map(params => params.get('id')),
     map(id => Number(id)),
     switchMap(id => {
       if (!Number.isInteger(id) || id <= 0) {
