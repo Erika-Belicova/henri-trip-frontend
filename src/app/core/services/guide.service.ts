@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { GuideRequestDTO } from '../../shared/interfaces/guide/guide-request-dto';
 import { GuideUpdateRequestDTO } from '../../shared/interfaces/guide/guide-update-request-dto';
 import { GuideResponseDTO } from '../../shared/interfaces/guide/guide-response-dto';
+import { GuideDayResponseDTO } from '../../shared/interfaces/guide/guide-day-response-dto';
 import { Page } from '../../shared/interfaces/page';
 
 @Injectable({
@@ -35,6 +36,16 @@ export class GuideService {
       `${this.apiUrl}/${id}`
     ).pipe(
       map(guide => this.sortItinerary(guide))
+    );
+  }
+
+  // retrieve a specific day and its activities
+  getGuideDay(
+    guideId: number,
+    dayId: number
+  ): Observable<GuideDayResponseDTO> {
+    return this.http.get<GuideDayResponseDTO>(
+      `${this.apiUrl}/${guideId}/days/${dayId}`
     );
   }
 

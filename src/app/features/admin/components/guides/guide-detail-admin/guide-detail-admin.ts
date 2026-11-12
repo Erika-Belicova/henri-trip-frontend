@@ -8,6 +8,9 @@ import { toErrorMessage } from '../../../../../core/error-message';
 
 import type { GuideDetailState } from './../../../../../shared/interfaces/guide/guide-detail-state';
 
+import { ActivityResponseDTO } from '../../../../../shared/interfaces/activity/activity-response-dto';
+import { ActivityFormAdmin } from '../../activities/activity-form-admin/activity-form-admin';
+
 import {
   TRANSPORT_LABELS, SEASON_LABELS,
   AUDIENCE_LABELS, CATEGORY_LABELS
@@ -15,7 +18,7 @@ import {
 
 @Component({
   selector: 'app-guide-detail-admin',
-  imports: [AsyncPipe, RouterLink],
+  imports: [AsyncPipe, RouterLink, ActivityFormAdmin],
   templateUrl: './guide-detail-admin.html',
   styleUrl: './guide-detail-admin.scss',
 })
@@ -30,10 +33,19 @@ export class GuideDetailAdmin {
   audienceLabels = AUDIENCE_LABELS;
   categoryLabels = CATEGORY_LABELS;
 
+  // control itinerary editing mode
+  isItineraryEditMode = false;
+  showLeaveEditConfirmation = false;
+
   // control the visibility and loading state of the deletion modal
   showDeleteModal = false;
   isDeleting = false;
   deleteErrorMessage = '';
+
+  // activity creation modal
+  showActivityModal = false;
+  selectedDayId: number | null = null;
+  selectedVisitOrder = 0;
 
   // retrieve the guide ID from route changes and load the corresponding guide
   readonly guideState$ = this.route.paramMap.pipe(
@@ -71,6 +83,40 @@ export class GuideDetailAdmin {
       );
     })
   );
+
+  // activate itinerary editing mode
+  enterItineraryEditMode(): void {
+    this.isItineraryEditMode = true;
+  }
+
+  // leave itinerary editing mode
+  leaveItineraryEditMode(): void {
+    this.isItineraryEditMode = false;
+  }
+
+  // open activity creation modal for the selected day
+  openActivityModal(dayId: number, activities: ActivityResponseDTO[]): void {
+    if (!this.isItineraryEditMode) return;
+
+    this.selectedDayId = dayId;
+
+    this.selectedVisitOrder = activities.length > 0
+      ? Math.max(...activities.map(activity => activity.visitOrder)) + 1
+      : 1; // order of the first activity
+
+    this.showActivityModal = true;
+  }
+
+  // handle successful activity creation
+  onActivityCreated(): void {
+    this.closeActivityModal();
+  }
+
+  // close activity creation modal
+  closeActivityModal(): void {
+    this.showActivityModal = false;
+    this.selectedDayId = null;
+  }
 
   // open the confirmation modal before deleting the guide
   openDeleteModal(): void {

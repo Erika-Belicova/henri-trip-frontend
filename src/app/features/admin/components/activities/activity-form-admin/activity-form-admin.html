@@ -71,14 +71,30 @@
     type="text"
     formControlName="openingHours">
 
-  <label for="activity-website">Site internet (facultatif)</label>
-  <input
-    id="activity-website"
-    type="url"
-    formControlName="website">
+  <div>
+    <label for="activity-website">Site internet (facultatif)</label>
+    <input
+      id="website"
+      type="text"
+      formControlName="website"
+      placeholder="www.louvre.fr"
+      [attr.aria-invalid]="submitted && form.controls.website.invalid"
+      [attr.aria-describedby]="submitted && form.controls.website.invalid ? 'website-error' : null"
+    />
+
+    @if (submitted && form.controls.website.invalid) {
+      <span id="website-error">
+        @if (form.controls.website.hasError('maxlength')) {
+          L'URL ne peut pas dépasser 2048 caractères.
+        } @else if (form.controls.website.hasError('pattern')) {
+          Veuillez saisir une adresse de site internet valide.
+        }
+      </span>
+    }
+  </div>
 
   <div class="form-actions">
-    <button type="submit" [disabled]="isSaving">
+    <button type="submit" [disabled]="isSaving || (submitted && form.invalid)">
       {{ isSaving ? 'Enregistrement...' : 'Ajouter l’activité' }}
     </button>
 

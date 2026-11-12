@@ -1,4 +1,3 @@
-
 import { Component, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -36,6 +35,8 @@ export class ActivityFormAdmin {
 
   isSaving = false;
   errorMessage = '';
+  showDiscardConfirmation = false;
+  submitted = false;
 
   // form validation follows the backend ActivityRequestDTO constraints
   form = this.fb.group({
@@ -45,11 +46,16 @@ export class ActivityFormAdmin {
     address: ['', [Validators.required, Validators.maxLength(500)]],
     phoneNumber: ['', [Validators.maxLength(50)]],
     openingHours: ['', [Validators.maxLength(500)]],
-    website: ['', [Validators.maxLength(2048)]]
+    website: ['', [
+      Validators.maxLength(2048),
+      Validators.pattern(/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+([/?#].*)?$/)
+    ]]
   });
 
   // validate and submit the activity to its selected guide day
   onSubmit(): void {
+    this.submitted = true;
+
     if (this.form.invalid || this.isSaving) {
       this.form.markAllAsTouched();
       return;
@@ -67,7 +73,7 @@ export class ActivityFormAdmin {
       address: formValue.address!.trim(),
       phoneNumber: formValue.phoneNumber?.trim() || null,
       openingHours: formValue.openingHours?.trim() || null,
-      website: formValue.website?.trim() || null,
+      website: this.normalizeWebsite(formValue.website),
       visitOrder: this.visitOrder()
     };
 
@@ -87,10 +93,37 @@ export class ActivityFormAdmin {
     });
   }
 
-  // notify the parent that the user wants to close the form
+  // close the form or request confirmation if unsaved changes exist
   cancel(): void {
     if (this.isSaving) return;
 
+    if (this.form.dirty) {
+      this.showDiscardConfirmation = true;
+      return;
+    }
+
     this.cancelled.emit();
+  }
+
+  // keep editing and close the discard confirmation
+  cancelDiscard(): void {
+    this.showDiscardConfirmation = false;
+  }
+
+  // discard changes and close the creation form
+  confirmDiscard(): void {
+    this.showDiscardConfirmation = false;
+    this.cancelled.emit();
+  }
+
+  private normalizeWebsite(website: string | null | undefined): string | null {
+    const value = website?.trim();
+    if (!value) return null;
+
+    if (/^https?:\/\//i.test(value)) {
+      return value;
+    }
+
+    return `https://${value}`;
   }
 }

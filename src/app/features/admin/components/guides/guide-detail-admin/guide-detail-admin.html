@@ -64,64 +64,91 @@
       </section>
 
       <section class="itinerary">
-        <h2>Itinéraire</h2>
+        <div class="itinerary-header">
+          <h2>Itinéraire</h2>
+
+          @if (isItineraryEditMode) {
+            <button
+              type="button"
+              class="btn-edit"
+              (click)="leaveItineraryEditMode()">
+              Voir l'itinéraire
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn-edit"
+              (click)="enterItineraryEditMode()">
+              Modifier l'itinéraire
+            </button>
+          }
+        </div>
         @for (day of guide.days; track day.id) {
           <article class="day-card">
             <h3>Jour {{ day.dayNumber }}</h3>
 
             @if (day.activities.length === 0) {
-              <p>	Aucune activité prévue pour cette journée.</p>
+              <p>Aucune activité prévue pour cette journée.</p>
             }
 
             @for (activity of day.activities; track activity.id) {
               <div class="activity-card">
-                <h4>{{ activity.title }}</h4>
+                <div class="activity-card-header">
+                  <h4>{{ activity.title }}</h4>
+
+                  @if (isItineraryEditMode) {
+                    <button
+                      type="button"
+                      class="btn-activity-delete"
+                      aria-label="Supprimer cette activité">
+                      🗑
+                    </button>
+                  }
+                </div>
+
                 <p>{{ activity.description }}</p>
-                <p>
-                  <strong>Catégorie :</strong>
-                  {{ categoryLabels[activity.category] }}
-                </p>
 
-                @if (activity.address) {
-                  <p>
-                    <strong>Adresse:</strong>
-                    {{ activity.address }}
-                  </p>
-                }
-
-                @if (activity.phoneNumber) {
-                  <p>
-                    <strong>Téléphone:</strong>
-                    {{ activity.phoneNumber }}
-                  </p>
-                }
-
-                @if (activity.openingHours) {
-                  <p>
-                    <strong>Horaires d'ouverture:</strong>
-                    {{ activity.openingHours }}
-                  </p>
-                }
-
-                @if (activity.website) {
-                  <p>
-                    <strong>Site internet:</strong>
-                    <a
-                      [href]="activity.website"
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      Visiter le site internet
-                    </a>
-                  </p>
-                }
+                <button
+                  type="button"
+                  class="btn-view-details">
+                  Voir les détails
+                </button>
               </div>
             }
-          </article>
 
+            @if (isItineraryEditMode) {
+              <button
+                type="button"
+                class="btn-add-activity"
+                (click)="openActivityModal(day.id, day.activities)">
+                + Ajouter une activité
+              </button>
+            }
+          </article>
         } @empty {
           <p>Aucun itinéraire n'a encore été ajouté.</p>
         }
       </section>
+
+      @if (showActivityModal && selectedDayId !== null) {
+        <div class="modal-overlay activity-modal-overlay">
+          <section
+            class="activity-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="activity-modal-title">
+
+            <app-activity-form-admin
+              [guideId]="guide.id"
+              [dayId]="selectedDayId"
+              [visitOrder]="selectedVisitOrder"
+              (activityCreated)="onActivityCreated()"
+              (cancelled)="closeActivityModal()">
+            </app-activity-form-admin>
+
+          </section>
+        </div>
+      }
 
       <!-- delete action, at the bottom of the detail page -->
       <section class="delete-section">
