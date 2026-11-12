@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import { catchError, map, of, startWith, switchMap, Subject } from 'rxjs';
 
 import { GuideService } from '../../../../../core/services/guide.service';
+import { ActivityService } from '../../../../../core/services/activity.service';
 import { toErrorMessage } from '../../../../../core/error-message';
 
 import type { GuideDetailState } from './../../../../../shared/interfaces/guide/guide-detail-state';
@@ -47,6 +48,21 @@ export class GuideDetailAdmin {
   selectedDayId: number | null = null;
   selectedVisitOrder = 0;
 
+  // activity deletion confirmation modal
+  showActivityDeleteModal = false;
+  isDeletingActivity = false;
+  activityDeleteErrorMessage = '';
+
+  selectedActivity: {
+    guideId: number;
+    dayId: number;
+    activityId: number;
+    title: string;
+  } | null = null;
+
+  private readonly activityService = inject(ActivityService);
+  private readonly refreshGuide$ = new Subject<void>();
+
   // retrieve the guide ID from route changes and load the corresponding guide
   readonly guideState$ = this.route.paramMap.pipe(
     map(params => params.get('id')),
@@ -59,27 +75,27 @@ export class GuideDetailAdmin {
           errorMessage: 'Identifiant du guide invalide.'
         } satisfies GuideDetailState);
       }
+      return this.refreshGuide$.pipe(
+        startWith(undefined),
+        switchMap(() => this.guideService.getGuideById(id).pipe(
+          map((guide): GuideDetailState => ({
+            guide,
+            isLoading: false,
+            errorMessage: ''
+          })),
 
-      return this.guideService.getGuideById(id).pipe(
-        map((guide): GuideDetailState => ({
-          guide,
-          isLoading: false,
-          errorMessage: ''
-        })),
+          startWith({
+            guide: null,
+            isLoading: true,
+            errorMessage: ''
+          }),
 
-        // show a loading state while retrieving the guide
-        startWith({
-          guide: null,
-          isLoading: true,
-          errorMessage: ''
-        }),
-
-        // display an error if the request fails
-        catchError((err: unknown) => of({
-          guide: null,
-          isLoading: false,
-          errorMessage: toErrorMessage(err)
-        }))
+          catchError((err: unknown) => of({
+            guide: null,
+            isLoading: false,
+            errorMessage: toErrorMessage(err)
+          }))
+        ))
       );
     })
   );
@@ -146,6 +162,64 @@ export class GuideDetailAdmin {
       error: (err: unknown) => {
         this.deleteErrorMessage = toErrorMessage(err);
         this.isDeleting = false;
+      }
+    });
+  }
+
+  // open confirmation modal before deleting an activity
+  openActivityDeleteModal(
+    guideId: number,
+    dayId: number,
+    activityId: number,
+    title: string
+  ): void {
+    if (!this.isItineraryEditMode) return;
+
+    this.selectedActivity = {
+      guideId,
+      dayId,
+      activityId,
+      title
+    };
+
+    this.activityDeleteErrorMessage = '';
+    this.showActivityDeleteModal = true;
+  }
+
+  // close activity deletion modal
+  closeActivityDeleteModal(): void {
+    if (this.isDeletingActivity) return;
+
+    this.showActivityDeleteModal = false;
+    this.selectedActivity = null;
+    this.activityDeleteErrorMessage = '';
+  }
+
+  // delete activity after confirmation
+  deleteActivity(): void {
+    if (this.isDeletingActivity || !this.selectedActivity) return;
+
+    const { guideId, dayId, activityId } = this.selectedActivity;
+
+    this.isDeletingActivity = true;
+    this.activityDeleteErrorMessage = '';
+
+    this.activityService.deleteActivity(
+      guideId,
+      dayId,
+      activityId
+    ).subscribe({
+      next: () => {
+        this.isDeletingActivity = false;
+        this.showActivityDeleteModal = false;
+        this.selectedActivity = null;
+
+        // reload the guide and its itinerary
+        this.refreshGuide$.next();
+      },
+      error: (err: unknown) => {
+        this.activityDeleteErrorMessage = toErrorMessage(err);
+        this.isDeletingActivity = false;
       }
     });
   }

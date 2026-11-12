@@ -100,8 +100,15 @@
                     <button
                       type="button"
                       class="btn-activity-delete"
-                      aria-label="Supprimer cette activité">
-                      🗑
+                      aria-label="Supprimer cette activité"
+                      title="Supprimer cette activité"
+                      (click)="openActivityDeleteModal(
+                        guide.id,
+                        day.id,
+                        activity.id,
+                        activity.title
+                      )">
+                      X
                     </button>
                   }
                 </div>
@@ -159,6 +166,57 @@
           Supprimer ce guide
         </button>
       </section>
+
+      <!-- activity deletion confirmation modal -->
+      @if (showActivityDeleteModal && selectedActivity) {
+        <div class="modal-overlay">
+          <section
+            class="confirmation-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="activity-delete-modal-title"
+            aria-describedby="activity-delete-modal-description">
+
+            <h2 id="activity-delete-modal-title">
+              Supprimer cette activité ?
+            </h2>
+
+            <p id="activity-delete-modal-description">
+              Voulez-vous vraiment supprimer l'activité
+              <strong>« {{ selectedActivity.title }} »</strong> ?
+
+              Cette action est définitive.
+            </p>
+
+            @if (activityDeleteErrorMessage) {
+              <p class="error-message" role="alert">
+                {{ activityDeleteErrorMessage }}
+              </p>
+            }
+
+            <div class="modal-actions">
+              <button
+                type="button"
+                class="btn-cancel"
+                [disabled]="isDeletingActivity"
+                (click)="closeActivityDeleteModal()">
+                Annuler
+              </button>
+
+              <button
+                type="button"
+                class="btn-confirm-delete"
+                [disabled]="isDeletingActivity"
+                (click)="deleteActivity()">
+                {{ isDeletingActivity
+                  ? 'Suppression...'
+                  : 'Supprimer' }}
+              </button>
+            </div>
+
+          </section>
+        </div>
+      }
       
       <!-- deletion confirmation modal -->
       @if (showDeleteModal) {
