@@ -1,23 +1,17 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 
 import { GuideService } from '../../../../../core/services/guide.service';
 import { toErrorMessage } from '../../../../../core/error-message';
 
-import { GuideResponseDTO } from '../../../../../shared/interfaces/guide/guide-response-dto';
+import type { GuideDetailState } from './../../../../../shared/interfaces/guide/guide-detail-state';
 
 import {
   TRANSPORT_LABELS, SEASON_LABELS,
   AUDIENCE_LABELS, CATEGORY_LABELS
 } from '../../../../../shared/labels';
-
-interface GuideDetailState {
-  guide: GuideResponseDTO | null;
-  isLoading: boolean;
-  errorMessage: string;
-}
 
 @Component({
   selector: 'app-guide-detail-admin',
@@ -29,11 +23,17 @@ export class GuideDetailAdmin {
 
   private readonly guideService = inject(GuideService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   transportLabels = TRANSPORT_LABELS;
   seasonLabels = SEASON_LABELS;
   audienceLabels = AUDIENCE_LABELS;
   categoryLabels = CATEGORY_LABELS;
+
+  // control the visibility and loading state of the deletion modal
+  showDeleteModal = false;
+  isDeleting = false;
+  deleteErrorMessage = '';
 
   // retrieve the guide ID from the route and load the corresponding guide
   readonly guideState$ = of(this.route.snapshot.paramMap.get('id')).pipe(
@@ -70,4 +70,36 @@ export class GuideDetailAdmin {
       );
     })
   );
+
+  // open the confirmation modal before deleting the guide
+  openDeleteModal(): void {
+    this.deleteErrorMessage = '';
+    this.showDeleteModal = true;
+  }
+
+  // close the modal without deleting the guide
+  closeDeleteModal(): void {
+    if (this.isDeleting) return;
+
+    this.showDeleteModal = false;
+    this.deleteErrorMessage = '';
+  }
+
+  // delete the guide after confirmation and return to the guide list
+  deleteGuide(guideId: number): void {
+    if (this.isDeleting) return;
+
+    this.isDeleting = true;
+    this.deleteErrorMessage = '';
+
+    this.guideService.deleteGuide(guideId).subscribe({
+      next: () => {
+        this.router.navigate(['/admin/guides']);
+      },
+      error: (err: unknown) => {
+        this.deleteErrorMessage = toErrorMessage(err);
+        this.isDeleting = false;
+      }
+    });
+  }
 }
