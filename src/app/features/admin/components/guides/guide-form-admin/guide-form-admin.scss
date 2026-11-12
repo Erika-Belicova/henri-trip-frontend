@@ -1,0 +1,112 @@
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.form-header {
+  margin-bottom: 2rem;
+}
+
+form h1 {
+  margin-bottom: 2rem;
+}
+
+form > label {
+  display: block;
+  margin: 1.2rem 0 0.5rem;
+  font-weight: 600;
+}
+
+form > input,
+form > textarea {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+form > textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+form > h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+form > label input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+form > label:has(input[type="checkbox"]) {
+  display: inline-flex;
+  align-items: center;
+  margin: 0.3rem 1rem 0.3rem 0;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #f8f8f8;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+form > label:has(input[type="checkbox"]):hover {
+  background: #eee;
+}
+
+form p {
+  margin: 0.4rem 0;
+}
+
+form p:has(+ label) {
+  margin-bottom: 0.8rem;
+}
+
+.error-message {
+  color: #c62828;
+  margin-bottom: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.form-actions button {
+  padding: 0.7rem 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.form-actions button[type="submit"] {
+  background: #333;
+  color: white;
+  border-color: #333;
+}
+
+.form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .form-container {
+    padding: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}

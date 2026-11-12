@@ -1,0 +1,155 @@
+<div class="detail-container">
+
+  <header class="detail-header">
+    <a routerLink="/admin/guides">← Retour aux guides</a>
+  </header>
+
+  @if (guideState$ | async; as state) {
+
+    @if (state.isLoading) {
+      <p>Chargement du guide...</p>
+    }
+
+    @if (state.errorMessage) {
+      <p class="error-message">{{ state.errorMessage }}</p>
+
+      <a routerLink="/admin/guides">
+        Return to guides
+      </a>
+    }
+
+    @if (state.guide; as guide) {
+
+      <section class="guide-header">
+
+        <div>
+          <h1>{{ guide.title }}</h1>
+          <p>{{ guide.description }}</p>
+        </div>
+
+        <a
+          class="btn-edit"
+          [routerLink]="['/admin/guides', guide.id, 'edit']">
+          Modifier le guide
+        </a>
+
+      </section>
+
+      <section class="guide-information">
+
+        <h2>Informations du guide</h2>
+
+        <p>
+          <strong>Durée:</strong>
+          {{ guide.numberOfDays }} days
+        </p>
+
+        <div>
+          <strong>Mobilité:</strong>
+
+          @for (transport of guide.transports; track transport) {
+            <span class="option-tag">
+              {{ transportLabels[transport] }}
+            </span>
+          }
+        </div>
+
+        <div>
+          <strong>Saisons:</strong>
+
+          @for (season of guide.seasons; track season) {
+            <span class="option-tag">
+              {{ seasonLabels[season] }}
+            </span>
+          }
+        </div>
+
+        <div>
+          <strong>Pour qui:</strong>
+
+          @for (audience of guide.audiences; track audience) {
+            <span class="option-tag">
+              {{ audienceLabels[audience] }}
+            </span>
+          }
+        </div>
+
+      </section>
+
+      <section class="itinerary">
+
+        <h2>Itinéraire</h2>
+
+        @for (day of guide.days; track day.id) {
+
+          <article class="day-card">
+
+            <h3>Jour {{ day.dayNumber }}</h3>
+
+            @if (day.activities.length === 0) {
+              <p>	Aucune activité prévue pour cette journée.</p>
+            }
+
+            @for (activity of day.activities; track activity.id) {
+
+              <div class="activity-card">
+
+                <h4>{{ activity.title }}</h4>
+
+                <p>{{ activity.description }}</p>
+
+                <p>
+                  <strong>Catégorie :</strong>
+                  {{ categoryLabels[activity.category] }}
+                </p>
+
+                @if (activity.address) {
+                  <p>
+                    <strong>Adresse:</strong>
+                    {{ activity.address }}
+                  </p>
+                }
+
+                @if (activity.phoneNumber) {
+                  <p>
+                    <strong>Téléphone:</strong>
+                    {{ activity.phoneNumber }}
+                  </p>
+                }
+
+                @if (activity.openingHours) {
+                  <p>
+                    <strong>Horaires d'ouverture:</strong>
+                    {{ activity.openingHours }}
+                  </p>
+                }
+
+                @if (activity.website) {
+                  <p>
+                    <strong>Site internet:</strong>
+                    <a
+                      [href]="activity.website"
+                      target="_blank"
+                      rel="noopener noreferrer">
+                      Visit website
+                    </a>
+                  </p>
+                }
+
+              </div>
+
+            }
+
+          </article>
+
+        } @empty {
+          <p>No itinerary has been added yet.</p>
+        }
+
+      </section>
+
+    }
+
+  }
+
+</div>

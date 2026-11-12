@@ -128,16 +128,18 @@ export class GuideFormAdmin implements OnInit {
     this.isSaving = true;
     this.errorMessage = '';
 
+    // retrieve the form values and choose the appropriate API operation
     const formValue = this.form.getRawValue();
 
     const operation = this.isEditMode && this.guideId !== null
       ? this.guideService.updateGuide(this.guideId, formValue as GuideUpdateRequestDTO)
       : this.guideService.createGuide(formValue as GuideRequestDTO);
 
+    // navigate to the guide detail page after a successful save
     operation.subscribe({
-      next: () => {
+      next: (guide: GuideResponseDTO) => {
         this.isSaving = false;
-        this.router.navigate(['/admin/guides']);
+        this.router.navigate(['/admin/guides', guide.id]);
       },
       error: (err: unknown) => {
         this.errorMessage = toErrorMessage(err);

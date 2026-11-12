@@ -1,82 +1,87 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<div class="form-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-  <h1>{{ isEditMode ? 'Edit guide' : 'Create guide' }}</h1>
+    <h1>{{ isEditMode ? 'Modifier un guide' : 'Créer un guide' }}</h1>
 
-  @if (isLoading) {
-    <p>Loading guide...</p>
-  } @else {
+    @if (isLoading) {
+      <p>Chargement du guide...</p>
+    } @else {
 
-    @if (errorMessage) {
-      <p>{{ errorMessage }}</p>
+      @if (errorMessage) {
+        <p class="error-message">{{ errorMessage }}</p>
+      }
+
+      <label for="title">Titre</label>
+      <input id="title" type="text" formControlName="title">
+
+      @if (form.controls.title.touched && form.controls.title.invalid) {
+        <p>Le titre est obligatoire (200 caractères maximum).</p>
+      }
+
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        formControlName="description">
+      </textarea>
+
+      @if (form.controls.description.touched && form.controls.description.invalid) {
+        <p>La description est obligatoire (5000 caractères maximum).</p>
+      }
+
+      <label for="numberOfDays">Jours</label>
+      <input
+        id="numberOfDays"
+        type="number"
+        min="1"
+        formControlName="numberOfDays">
+
+      <h3>Mobilité</h3>
+
+      @for (option of transportOptions; track option) {
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isSelected('transports', option)"
+            (change)="toggleOption('transports', option)">
+          {{ transportLabels[option] }}
+        </label>
+      }
+
+      <h3>Saison</h3>
+
+      @for (option of seasonOptions; track option) {
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isSelected('seasons', option)"
+            (change)="toggleOption('seasons', option)">
+          {{ seasonLabels[option] }}
+        </label>
+      }
+
+      <h3>Pour qui</h3>
+
+      @for (option of audienceOptions; track option) {
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isSelected('audiences', option)"
+            (change)="toggleOption('audiences', option)">
+          {{ audienceLabels[option] }}
+        </label>
+      }
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="isSaving">
+          {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+
+        <button type="button" (click)="cancel()">
+          Annuler
+        </button>
+      </div>
+
     }
 
-    <label for="title">Title</label>
-    <input id="title" type="text" formControlName="title">
-
-    @if (form.controls.title.touched && form.controls.title.invalid) {
-      <p>Title is required (maximum 200 characters).</p>
-    }
-
-    <label for="description">Description</label>
-    <textarea
-      id="description"
-      formControlName="description">
-    </textarea>
-
-    @if (form.controls.description.touched && form.controls.description.invalid) {
-      <p>Description is required (maximum 5000 characters).</p>
-    }
-
-    <label for="numberOfDays">Number of days</label>
-    <input
-      id="numberOfDays"
-      type="number"
-      min="1"
-      formControlName="numberOfDays">
-
-    <h3>Transportation</h3>
-
-    @for (option of transportOptions; track option) {
-      <label>
-        <input
-          type="checkbox"
-          [checked]="isSelected('transports', option)"
-          (change)="toggleOption('transports', option)">
-        {{ transportLabels[option] }}
-      </label>
-    }
-
-    <h3>Seasons</h3>
-
-    @for (option of seasonOptions; track option) {
-      <label>
-        <input
-          type="checkbox"
-          [checked]="isSelected('seasons', option)"
-          (change)="toggleOption('seasons', option)">
-        {{ seasonLabels[option] }}
-      </label>
-    }
-
-    <h3>Audience</h3>
-
-    @for (option of audienceOptions; track option) {
-      <label>
-        <input
-          type="checkbox"
-          [checked]="isSelected('audiences', option)"
-          (change)="toggleOption('audiences', option)">
-        {{ audienceLabels[option] }}
-      </label>
-    }
-
-    <button type="submit" [disabled]="isSaving">
-      {{ isSaving ? 'Saving...' : (isEditMode ? 'Update guide' : 'Create guide') }}
-    </button>
-
-    <button type="button" (click)="cancel()">
-      Cancel
-    </button>
-  }
-
-</form>
+  </form>
+</div>

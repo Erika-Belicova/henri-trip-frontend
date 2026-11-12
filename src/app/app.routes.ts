@@ -42,6 +42,12 @@ export const routes: Routes = [
             .then(m => m.GuideFormAdmin)
       },
       {
+        path: 'guides/:id',
+        loadComponent: () =>
+          import('./features/admin/components/guides/guide-detail-admin/guide-detail-admin')
+            .then(m => m.GuideDetailAdmin)
+      },
+      {
         path: 'guides/:id/edit',
         loadComponent: () =>
           import('./features/admin/components/guides/guide-form-admin/guide-form-admin')
