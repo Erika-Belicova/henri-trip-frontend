@@ -1,0 +1,100 @@
+<div class="form-container">
+
+  <header class="detail-header">
+    @if (isEditMode) {
+      <a [routerLink]="['/admin/guides', guideId]">
+        ← Retour au guide
+      </a>
+    } @else {
+      <a routerLink="/admin/guides">
+        ← Retour à la gestion des guides
+      </a>
+    }
+  </header>
+  
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <h1>{{ isEditMode ? 'Modifier un guide' : 'Créer un guide' }}</h1>
+
+    @if (isLoading) {
+      <p>Chargement du guide...</p>
+    } @else {
+
+      @if (errorMessage) {
+        <p class="error-message">{{ errorMessage }}</p>
+      }
+
+      <label for="title">Titre</label>
+      <input id="title" type="text" formControlName="title">
+
+      @if (form.controls.title.touched && form.controls.title.invalid) {
+        <p>Le titre est obligatoire (200 caractères maximum).</p>
+      }
+
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        formControlName="description">
+      </textarea>
+
+      @if (form.controls.description.touched && form.controls.description.invalid) {
+        <p>La description est obligatoire (5000 caractères maximum).</p>
+      }
+
+      <label for="numberOfDays">Jours</label>
+      <input
+        id="numberOfDays"
+        type="number"
+        min="1"
+        formControlName="numberOfDays">
+
+      <h3>Mobilité</h3>
+
+      @for (option of transportOptions; track option) {
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isSelected('transports', option)"
+            (change)="toggleOption('transports', option)">
+          {{ transportLabels[option] }}
+        </label>
+      }
+
+      <h3>Saison</h3>
+
+      @for (option of seasonOptions; track option) {
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isSelected('seasons', option)"
+            (change)="toggleOption('seasons', option)">
+          {{ seasonLabels[option] }}
+        </label>
+      }
+
+      <h3>Pour qui</h3>
+
+      @for (option of audienceOptions; track option) {
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isSelected('audiences', option)"
+            (change)="toggleOption('audiences', option)">
+          {{ audienceLabels[option] }}
+        </label>
+      }
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="isSaving">
+          {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+
+        <button type="button" (click)="cancel()">
+          Annuler
+        </button>
+      </div>
+
+    }
+
+  </form>
+</div>

@@ -1,0 +1,125 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f7f8fa;
+  color: #353434;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 76px;
+  padding: 0 40px;
+  background: #ffff;
+  border-bottom: 1px solid #e0dede;
+  box-sizing: border-box;
+}
+
+.brand {
+  font-size: 1.3rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  color: #263d70;
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  a {
+    color: #353434;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #263d70;
+    }
+  }
+}
+
+.session-email {
+  color: #595959;
+  font-size: 0.85rem;
+}
+
+.btn-logout {
+  padding: 9px 17px;
+  background: #263d70;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #1c305b;
+  }
+}
+
+.page {
+  padding: 0;
+  min-height: calc(100vh - 76px);
+  background: #f7f8fa;
+}
+
+@media (max-width: 650px) {
+  .topbar {
+    padding: 16px 20px;
+    align-items: flex-start;
+    gap: 16px;
+    flex-direction: column;
+  }
+
+  .session {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+}
+
+button {
+  font-family: inherit;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.025em;
+}
+
+
+.page {
+  min-height: calc(100vh - 76px);
+  padding: 55px 65px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1500px;
+  min-height: calc(100vh - 186px);
+  margin: 0 auto;
+  padding: 55px 60px;
+  box-sizing: border-box;
+
+  background: #f7f8fa;
+  border: 1px solid #e0dede;
+  border-radius: 16px;
+
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.045);
+}
+
+@media (max-width: 750px) {
+  .page {
+    padding: 25px 18px;
+  }
+
+  .page-container {
+    padding: 30px 22px;
+    min-height: calc(100vh - 126px);
+  }
+}

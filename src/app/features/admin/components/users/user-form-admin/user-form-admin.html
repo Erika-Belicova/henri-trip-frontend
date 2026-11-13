@@ -1,0 +1,112 @@
+<div class="user-form-container">
+  <header class="detail-header">
+    <a routerLink="/admin/users">← Retour à la gestion des utilisateurs</a>
+  </header>
+
+  <header class="form-header">
+    <span class="header-eyebrow">ESPACE ADMINISTRATION</span>
+    <h1>Nouvel utilisateur</h1>
+    <p>Créez un nouveau compte HenriTrip et définissez ses accès.</p>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    @if (errorMessage) {
+      <div class="error-message" role="alert">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <section class="form-section">
+      <h2>Informations du compte</h2>
+      <div class="form-field">
+        <label for="email">Adresse e-mail</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="exemple@email.com"
+          autocomplete="email">
+
+        @if (form.controls.email.touched &&
+            form.controls.email.errors) {
+
+          @if (form.controls.email.errors['required']) {
+            <span class="field-error">
+              L'adresse e-mail est obligatoire.
+            </span>
+          }
+
+          @if (form.controls.email.errors['email']) {
+            <span class="field-error">
+              Veuillez saisir une adresse e-mail valide.
+            </span>
+          }
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="password">Mot de passe</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Minimum 8 caractères"
+          autocomplete="new-password">
+
+        @if (form.controls.password.touched &&
+            form.controls.password.errors) {
+
+          @if (form.controls.password.errors['required']) {
+            <span class="field-error">
+              Le mot de passe est obligatoire.
+            </span>
+          }
+
+          @if (form.controls.password.errors['minlength']) {
+            <span class="field-error">
+              Le mot de passe doit contenir au moins 8 caractères.
+            </span>
+          }
+        }
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Autorisations</h2>
+      <div class="form-field">
+        <label for="role">Rôle de l'utilisateur</label>
+        <select id="role" formControlName="role">
+          @for (role of userRoles; track role) {
+            <option [value]="role">
+              {{ role === 'ADMIN' ? 'Administrateur' : 'Utilisateur' }}
+            </option>
+          }
+        </select>
+
+        <p class="field-hint">
+          Les administrateurs peuvent accéder à l'espace
+          d'administration et gérer les utilisateurs.
+        </p>
+      </div>
+
+    </section>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        class="cancel-action"
+        [disabled]="isSaving"
+        (click)="cancel()">
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="primary-action"
+        [disabled]="isSaving">
+        {{ isSaving ? 'Création...' : 'Créer l’utilisateur' }}
+      </button>
+    </div>
+  </form>
+
+</div>

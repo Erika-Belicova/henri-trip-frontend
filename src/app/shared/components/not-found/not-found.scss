@@ -1,0 +1,103 @@
+:host {
+  display: block;
+  min-height: 100%;
+  color: #353434;
+}
+
+.not-found-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 65vh;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.not-found-card {
+  width: 100%;
+  max-width: 600px;
+  padding: 55px 35px;
+  box-sizing: border-box;
+
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e0dede;
+  border-radius: 12px;
+
+  box-shadow: 0 4px 14px rgba(38, 61, 112, 0.05);
+}
+
+.header-eyebrow {
+  color: #404b5a;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.error-code {
+  margin: 25px 0 10px;
+  color: #263d70;
+  font-size: 6rem;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+
+h1 {
+  margin: 15px 0;
+  font-size: 1.7rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+
+p {
+  max-width: 420px;
+  margin: 0 auto 30px;
+  color: #595959;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 22px;
+
+  border: none;
+  border-radius: 8px;
+  background: #263d70;
+  color: #fff;
+
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #1c305b;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #94aaec;
+    outline-offset: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .not-found-card {
+    padding: 40px 20px;
+  }
+
+  .error-code {
+    font-size: 4.8rem;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+}

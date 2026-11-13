@@ -1,3 +1,99 @@
 import { Routes } from '@angular/router';
+import { authGuard, guestGuard, adminGuard } from './core/guards/auth.guard';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+
+  { 
+    path: '', 
+    redirectTo: '/login', 
+    pathMatch: 'full' 
+  },
+
+  // public routes
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/components/login/login')
+        .then(m => m.Login),
+    canActivate: [guestGuard]
+  },
+
+  // admin routes
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/admin/components/dashboard/dashboard')
+            .then(m => m.Dashboard)
+      },
+      {
+        path: 'guides',
+        loadComponent: () =>
+          import('./features/admin/components/guides/guide-list-admin/guide-list-admin')
+            .then(m => m.GuideListAdmin)
+      },
+      {
+        path: 'guides/new',
+        loadComponent: () =>
+          import('./features/admin/components/guides/guide-form-admin/guide-form-admin')
+            .then(m => m.GuideFormAdmin)
+      },
+      {
+        path: 'guides/:id',
+        loadComponent: () =>
+          import('./features/admin/components/guides/guide-detail-admin/guide-detail-admin')
+            .then(m => m.GuideDetailAdmin)
+      },
+      {
+        path: 'guides/:id/edit',
+        loadComponent: () =>
+          import('./features/admin/components/guides/guide-form-admin/guide-form-admin')
+            .then(m => m.GuideFormAdmin)
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/admin/components/users/user-list-admin/user-list-admin')
+            .then(m => m.UserListAdmin)
+      },
+      {
+        path: 'users/create',
+        loadComponent: () =>
+          import('./features/admin/components/users/user-form-admin/user-form-admin')
+            .then(m => m.UserFormAdmin)
+      }
+    ]
+  },
+
+  // user routes
+  {
+    path: 'guides',
+    loadComponent: () =>
+      import('./features/user/components/guide-list/guide-list')
+        .then(m => m.GuideList),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'guides/:id',
+    loadComponent: () =>
+      import('./features/user/components/guide-detail/guide-detail')
+        .then(m => m.GuideDetail),
+    canActivate: [authGuard]
+  },
+
+  // not found
+  {
+    path: '404',
+    loadComponent: () =>
+      import('./shared/components/not-found/not-found')
+        .then(m => m.NotFound)
+  },
+  { 
+    path: '**', 
+    redirectTo: '/404' 
+  }
+
+];
