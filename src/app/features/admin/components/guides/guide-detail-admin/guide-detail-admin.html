@@ -31,8 +31,9 @@
       <section class="guide-information">
         <h2>Informations du guide</h2>
         <p>
-          <strong>Durée:</strong>
-          {{ guide.numberOfDays }} days
+          <strong>Durée :</strong>
+          {{ guide.numberOfDays }}
+          {{ guide.numberOfDays > 1 ? 'jours' : 'jour' }}
         </p>
 
         <div>

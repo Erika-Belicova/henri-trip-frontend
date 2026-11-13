@@ -59,25 +59,24 @@
     </p>
   }
 
-  <label for="activity-phone">Téléphone (facultatif)</label>
+  <label for="activity-phone" class="optional-label">Téléphone (facultatif)</label>
   <input
     id="activity-phone"
     type="tel"
     formControlName="phoneNumber">
 
-  <label for="activity-hours">Horaires d'ouverture (facultatif)</label>
+  <label for="activity-hours" class="optional-label">Horaires d'ouverture (facultatif)</label>
   <input
     id="activity-hours"
     type="text"
     formControlName="openingHours">
 
   <div>
-    <label for="activity-website">Site internet (facultatif)</label>
+    <label for="activity-website" class="optional-label">Site internet (facultatif)</label>
     <input
-      id="website"
+      id="acitivty-website"
       type="text"
       formControlName="website"
-      placeholder="www.louvre.fr"
       [attr.aria-invalid]="submitted && form.controls.website.invalid"
       [attr.aria-describedby]="submitted && form.controls.website.invalid ? 'website-error' : null"
     />
