@@ -117,7 +117,8 @@
 
                 <button
                   type="button"
-                  class="btn-view-details">
+                  class="btn-view-details"
+                  (click)="openActivityDetails(activity)">
                   Voir les détails
                 </button>
               </div>
@@ -152,6 +153,28 @@
               (activityCreated)="onActivityCreated()"
               (cancelled)="closeActivityModal()">
             </app-activity-form-admin>
+
+          </section>
+        </div>
+      }
+
+      <!-- show activity details -->
+      @if (selectedActivityDetails) {
+        <div
+          class="modal-overlay"
+          (click)="closeActivityDetails()">
+
+          <section
+            class="activity-detail-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Détails de l'activité"
+            (click)="$event.stopPropagation()">
+
+            <app-activity-detail-admin
+              [activity]="selectedActivityDetails"
+              (closed)="closeActivityDetails()">
+            </app-activity-detail-admin>
 
           </section>
         </div>

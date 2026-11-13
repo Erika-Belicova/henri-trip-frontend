@@ -12,6 +12,7 @@ import type { GuideDetailState } from './../../../../../shared/interfaces/guide/
 import { ActivityResponseDTO } from '../../../../../shared/interfaces/activity/activity-response-dto';
 import { GuideResponseDTO } from '../../../../../shared/interfaces/guide/guide-response-dto';
 import { ActivityFormAdmin } from '../../activities/activity-form-admin/activity-form-admin';
+import { ActivityDetailAdmin } from '../../activities/activity-detail-admin/activity-detail-admin';
 
 import {
   TRANSPORT_LABELS, SEASON_LABELS,
@@ -20,7 +21,7 @@ import {
 
 @Component({
   selector: 'app-guide-detail-admin',
-  imports: [AsyncPipe, RouterLink, ActivityFormAdmin],
+  imports: [AsyncPipe, RouterLink, ActivityFormAdmin, ActivityDetailAdmin],
   templateUrl: './guide-detail-admin.html',
   styleUrl: './guide-detail-admin.scss',
 })
@@ -57,6 +58,8 @@ export class GuideDetailAdmin {
   isDeletingActivity = false;
   activityDeleteErrorMessage = '';
 
+  // activity detail modal
+  selectedActivityDetails: ActivityResponseDTO | null = null;
 
   selectedActivity: {
     guideId: number;
@@ -253,5 +256,15 @@ export class GuideDetailAdmin {
         this.isDeletingActivity = false;
       }
     });
+  }
+
+  // open activity details
+  openActivityDetails(activity: ActivityResponseDTO): void {
+    this.selectedActivityDetails = activity;
+  }
+
+  // close activity details
+  closeActivityDetails(): void {
+    this.selectedActivityDetails = null;
   }
 }

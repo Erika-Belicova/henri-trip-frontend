@@ -1,0 +1,83 @@
+<div class="activity-details">
+
+  <header class="activity-details-header">
+    <div>
+      <h2>Activité</h2>
+      <h3>{{ activity.title }}</h3>
+    </div>
+
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Fermer"
+      (click)="close()">
+      &times;
+    </button>
+  </header>
+
+  <section class="activity-section">
+    <h3>Description</h3>
+    <p>{{ activity.description || '—' }}</p>
+  </section>
+
+  <section class="activity-section">
+    <h3>Informations générales</h3>
+
+    <div class="information-item">
+      <span>Catégorie</span>
+      <p>{{ categoryLabels[activity.category] || '—' }}</p>
+    </div>
+  </section>
+
+  <section class="activity-section">
+    <h3>Informations pratiques</h3>
+
+    <div class="information-item">
+      <span>Adresse</span>
+      <p>{{ activity.address || 'Non renseignée' }}</p>
+    </div>
+
+    <div class="information-item">
+      <span>Téléphone</span>
+      @if (activity.phoneNumber) {
+        <p>
+          <a [href]="'tel:' + activity.phoneNumber">
+            {{ activity.phoneNumber }}
+          </a>
+        </p>
+      } @else {
+        <p class="empty-value">Non renseigné</p>
+      }
+    </div>
+
+    <div class="information-item">
+      <span>Horaires d'ouverture</span>
+      <p>{{ activity.openingHours || 'Non renseignés' }}</p>
+    </div>
+
+    <div class="information-item">
+      <span>Site internet</span>
+      @if (activity.website) {
+        <p>
+          <a
+            [href]="activity.website.startsWith('http')
+              ? activity.website
+              : 'https://' + activity.website"
+            target="_blank"
+            rel="noopener noreferrer">
+            {{ activity.website }}
+          </a>
+        </p>
+      } @else {
+        <p class="empty-value">Non renseigné</p>
+      }
+    </div>
+  </section>
+
+  <footer class="activity-details-footer">
+    <button type="button" (click)="close()">
+      Fermer
+    </button>
+  </footer>
+
+</div>
