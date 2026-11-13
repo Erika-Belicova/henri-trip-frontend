@@ -52,6 +52,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/components/guides/guide-form-admin/guide-form-admin')
             .then(m => m.GuideFormAdmin)
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/admin/components/users/user-list-admin/user-list-admin')
+            .then(m => m.UserListAdmin)
+      },
+      {
+        path: 'users/create',
+        loadComponent: () =>
+          import('./features/admin/components/users/user-form-admin/user-form-admin')
+            .then(m => m.UserFormAdmin)
       }
     ]
   },

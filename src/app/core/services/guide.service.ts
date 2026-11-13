@@ -7,6 +7,7 @@ import { GuideRequestDTO } from '../../shared/interfaces/guide/guide-request-dto
 import { GuideUpdateRequestDTO } from '../../shared/interfaces/guide/guide-update-request-dto';
 import { GuideResponseDTO } from '../../shared/interfaces/guide/guide-response-dto';
 import { GuideDayResponseDTO } from '../../shared/interfaces/guide/guide-day-response-dto';
+import { GuideInvitationResponseDTO } from '../../shared/interfaces/guide/guide-invitation-response-dto';
 import { Page } from '../../shared/interfaces/page';
 
 @Injectable({
@@ -84,6 +85,15 @@ export class GuideService {
       }));
 
     return { ...guide, days };
+  }
+
+  // retrieve all users assigned to a specific guide
+  getGuideInvitations(
+    guideId: number
+  ): Observable<GuideInvitationResponseDTO[]> {
+    return this.http.get<GuideInvitationResponseDTO[]>(
+      `${this.apiUrl}/${guideId}/invitations`
+    );
   }
 
 }

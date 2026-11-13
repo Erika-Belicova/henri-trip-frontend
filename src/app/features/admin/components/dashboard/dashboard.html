@@ -1,13 +1,194 @@
-<h1>Admin Dashboard</h1>
+<div class="dashboard-container">
 
-<section>
-  <h2>Guide Management</h2>
-  <a routerLink="/admin/guides">View all guides</a>
-  <a routerLink="/admin/guides/new">Create a guide</a>
-</section>
+  <header class="dashboard-header">
+    <div>
+      <span class="dashboard-eyebrow">ESPACE ADMINISTRATION</span>
+      <h1>Tableau de bord</h1>
+      <p>
+        Bienvenue dans votre espace d'administration HenriTrip.
+        Gérez vos guides et les utilisateurs de votre application.
+      </p>
+    </div>
+  </header>
 
-<section>
-  <h2>User Management</h2>
-  <a routerLink="/admin/users">View all users</a>
-  <a routerLink="/admin/users/create">Create a user</a>
-</section>
+  @if (dashboardState$ | async; as state) {
+
+    @if (state.errorMessage) {
+      <div class="error-message" role="alert">
+        {{ state.errorMessage }}
+      </div>
+    }
+
+    <section class="statistics-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-eyebrow">VUE D'ENSEMBLE</span>
+          <h2>Statistiques</h2>
+        </div>
+      </div>
+
+      <div class="statistics-grid">
+
+        <article
+          class="stat-card"
+          routerLink="/admin/guides"
+          role="link"
+          tabindex="0">
+          <div class="stat-icon guide-icon">
+            <svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H20v17H5.5A2.5 2.5 0 0 1 3 17.5z"/>
+              <path d="M3 5.5v12M7 7h9M7 11h9M7 15h6"/>
+            </svg>
+          </div>
+
+          <div class="stat-content">
+            <span class="stat-label">Guides disponibles</span>
+
+            @if (state.isLoading) {
+              <span class="stat-value">...</span>
+            } @else {
+              <span class="stat-value">
+                {{ state.totalGuides }}
+              </span>
+            }
+
+            <span class="stat-description">
+              Guides enregistrés dans l'application
+            </span>
+          </div>
+        </article>
+
+        <article
+          class="stat-card"
+          routerLink="/admin/users"
+          role="link"
+          tabindex="0">
+          <div class="stat-icon user-icon">
+            <svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 21a8 8 0 0 1 16 0"/>
+            </svg>
+          </div>
+
+          <div class="stat-content">
+            <span class="stat-label">Utilisateurs</span>
+
+            @if (state.isLoading) {
+              <span class="stat-value">...</span>
+            } @else {
+              <span class="stat-value">
+                {{ state.totalUsers }}
+              </span>
+            }
+
+            <span class="stat-description">
+              Comptes utilisateurs enregistrés
+            </span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  }
+
+  <section class="management-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-eyebrow">GESTION</span>
+        <h2>Administration</h2>
+        <p>Accédez rapidement aux différentes fonctionnalités.</p>
+      </div>
+    </div>
+
+    <div class="management-grid">
+
+      <article class="management-card">
+
+        <div class="management-card-top">
+          <div class="management-icon guide-management-icon">
+            <svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H20v17H5.5A2.5 2.5 0 0 1 3 17.5z"/>
+              <path d="M3 5.5v12M7 7h9M7 11h9M7 15h6"/>
+            </svg>
+          </div>
+        </div>
+
+        <h3>Gestion des guides</h3>
+
+        <p>
+          Créez, modifiez et supprimez vos guides touristiques.
+          Organisez les journées et les activités de chaque itinéraire.
+        </p>
+
+        <div class="management-actions">
+          <a
+            routerLink="/admin/guides"
+            class="primary-action">
+            Voir les guides
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a
+            routerLink="/admin/guides/new"
+            class="secondary-action">
+            + Nouveau guide
+          </a>
+        </div>
+
+      </article>
+
+      <article class="management-card">
+
+        <div class="management-card-top">
+          <div class="management-icon user-management-icon">
+            <svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 21a8 8 0 0 1 16 0"/>
+            </svg>
+          </div>
+        </div>
+
+        <h3>Gestion des utilisateurs</h3>
+
+        <p>
+          Consultez les comptes enregistrés, créez de nouveaux
+          utilisateurs et gérez leurs accès à l'application.
+        </p>
+
+        <div class="management-actions">
+          <a
+            routerLink="/admin/users"
+            class="primary-action">
+            Voir les utilisateurs
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a
+            routerLink="/admin/users/create"
+            class="secondary-action">
+            + Nouvel utilisateur
+          </a>
+        </div>
+
+      </article>
+
+    </div>
+  </section>
+
+  <footer class="dashboard-footer">
+    <span>HenriTrip</span>
+    <span>Administration de la plateforme</span>
+  </footer>
+
+</div>

@@ -1,0 +1,234 @@
+<div class="users-container">
+
+  <header class="users-header">
+    <div>
+      <span class="header-eyebrow">ESPACE ADMINISTRATION</span>
+      <h1>Gestion des utilisateurs</h1>
+      <p>
+        Consultez les comptes et gérez les accès aux guides HenriTrip.
+      </p>
+    </div>
+
+    <a routerLink="/admin/users/create" class="primary-action">
+      <span>+</span>
+      Nouvel utilisateur
+    </a>
+  </header>
+
+  @if (userListState$ | async; as state) {
+
+    @if (state.errorMessage) {
+      <div class="error-message" role="alert">
+        {{ state.errorMessage }}
+        <button type="button" (click)="loadUsersAgain()">
+          Réessayer
+        </button>
+      </div>
+    }
+
+    <section class="users-overview">
+
+      <div class="overview-card">
+        <span class="overview-label">Utilisateurs enregistrés</span>
+        <strong>{{ state.isLoading ? '...' : state.users.length }}</strong>
+      </div>
+
+      <div class="overview-card">
+        <span class="overview-label">Administrateurs</span>
+        <strong>
+          {{ state.isLoading ? '...' : adminCount(state.users) }}
+        </strong>
+      </div>
+
+    </section>
+
+    <section class="users-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-eyebrow">COMPTES</span>
+          <h2>Liste des utilisateurs</h2>
+          <p>Consultez les utilisateurs et leurs guides accessibles.</p>
+        </div>
+
+        <span class="user-count">
+          {{ filteredUsers(state.users).length }} résultat(s)
+        </span>
+      </div>
+
+      <div class="search-container">
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          placeholder="Rechercher par adresse e-mail..."
+          [value]="searchQuery"
+          (input)="searchQuery = $any($event.target).value">
+      </div>
+
+      @if (state.isLoading) {
+        <div class="empty-state">
+          <span class="loading-indicator"></span>
+          <p>Chargement des utilisateurs...</p>
+        </div>
+      }
+
+      @else if (!state.errorMessage && state.users.length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">U</span>
+          <h3>Aucun utilisateur</h3>
+          <p>Il n'y a pas encore de compte enregistré.</p>
+          <a routerLink="/admin/users/create" class="primary-action">
+            Créer un utilisateur
+          </a>
+        </div>
+      }
+
+      @else if (filteredUsers(state.users).length === 0) {
+        <div class="empty-state">
+          <h3>Aucun résultat</h3>
+          <p>Aucun utilisateur ne correspond à votre recherche.</p>
+        </div>
+      }
+
+      @else {
+        <div class="users-grid">
+
+          @for (user of filteredUsers(state.users); track user.id) {
+            <article class="user-card">
+              <div class="user-card-header">
+                <div class="user-avatar">
+                  {{ user.email.charAt(0).toUpperCase() }}
+                </div>
+                <div class="user-identity">
+                  <h3>{{ user.email }}</h3>
+                  <span
+                    class="role-badge"
+                    [class.admin-role]="user.role === 'ADMIN'">
+                    {{ user.role }}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  class="delete-button"
+                  title="Supprimer cet utilisateur"
+                  aria-label="Supprimer cet utilisateur"
+                  (click)="openDeleteModal(user)">
+                  <span aria-hidden="true">×</span>
+                </button>
+
+              </div>
+
+              <div class="user-metadata">
+                <span>Inscrit le</span>
+                <strong>{{ user.createdAt | date:'dd/MM/yyyy' }}</strong>
+              </div>
+
+              <div class="guides-accordion">
+
+                <button
+                  type="button"
+                  class="accordion-trigger"
+                  [attr.aria-expanded]="isExpanded(user.id)"
+                  (click)="toggleGuides(user.id)">
+
+                  <span class="accordion-label">
+                    <span aria-hidden="true">▤</span>
+                    Guides accessibles
+                    <span class="guide-count">
+                      {{ user.guides.length }}
+                    </span>
+                  </span>
+
+                  <span
+                    class="accordion-arrow"
+                    [class.expanded]="isExpanded(user.id)">
+                    ▾
+                  </span>
+
+                </button>
+
+                @if (isExpanded(user.id)) {
+                  <div class="accordion-content">
+                    @if (user.guides.length === 0) {
+                      <p class="no-guides">
+                        Aucun guide attribué à cet utilisateur.
+                      </p>
+                    }
+
+                    @else {
+                      @for (guide of user.guides; track guide.id) {
+                        <div class="guide-entry">
+                          <span class="guide-entry-icon">⌖</span>
+                          <span>{{ guide.title }}</span>
+                        </div>
+                      }
+                    }
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <footer class="users-footer">
+    <span>HenriTrip</span>
+    <span>Administration de la plateforme</span>
+  </footer>
+
+</div>
+
+@if (showDeleteModal && selectedUser) {
+
+  <div class="modal-backdrop">
+
+    <section
+      class="confirmation-modal"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="delete-title">
+
+      <div class="modal-icon">!</div>
+
+      <h2 id="delete-title">Supprimer cet utilisateur ?</h2>
+
+      <p>
+        Vous êtes sur le point de supprimer le compte
+        <strong>{{ selectedUser.email }}</strong>.
+        Cette action est irréversible.
+      </p>
+
+      @if (deleteErrorMessage) {
+        <div class="error-message" role="alert">
+          {{ deleteErrorMessage }}
+        </div>
+      }
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="cancel-action"
+          [disabled]="isDeleting"
+          (click)="closeDeleteModal()">
+          Annuler
+        </button>
+
+        <button
+          type="button"
+          class="danger-action"
+          [disabled]="isDeleting"
+          (click)="deleteUser()">
+          {{ isDeleting ? 'Suppression...' : 'Supprimer' }}
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+}

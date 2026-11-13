@@ -1,0 +1,109 @@
+.user-form-container {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.form-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0.5rem 0;
+  }
+
+  p {
+    color: #777;
+  }
+}
+
+.header-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.form-section {
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+
+  h2 {
+    margin: 0 0 1.5rem;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    font-weight: 600;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font: inherit;
+  }
+}
+
+.field-error {
+  color: #c0392b;
+  font-size: 0.85rem;
+}
+
+.field-hint {
+  margin: 0;
+  color: #777;
+  font-size: 0.85rem;
+}
+
+.error-message {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: #c0392b;
+  background: #fff0f0;
+  border-radius: 8px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancel-action,
+.primary-action {
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.cancel-action {
+  background: #eee;
+  color: #333;
+}
+
+.primary-action {
+  background: #263f35;
+  color: white;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
