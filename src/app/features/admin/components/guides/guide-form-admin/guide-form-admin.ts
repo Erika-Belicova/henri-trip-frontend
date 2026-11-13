@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { GuideService } from '../../../../../core/services/guide.service';
 import { toErrorMessage } from '../../../../../core/error-message';
@@ -20,7 +20,7 @@ import {
 
 @Component({
   selector: 'app-guide-form-admin',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './guide-form-admin.html',
   styleUrl: './guide-form-admin.scss',
 })

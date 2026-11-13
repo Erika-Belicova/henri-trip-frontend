@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -17,6 +17,7 @@ export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -41,16 +42,20 @@ export class Login {
     const credentials: LoginRequestDTO = this.loginForm.getRawValue();
 
     this.authService.login(credentials)
-      .pipe(finalize(() => this.isLoading = false))
+      .pipe(finalize(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }))
       .subscribe({
         next: () => {
           this.router.navigate([
             this.authService.isAdmin() ? '/admin' : '/guides'
           ]);
         },
-        error: (error: unknown) => {
-          this.errorMessage = toErrorMessage(error);
+        error: () => {
+          this.errorMessage = 'Adresse e-mail ou mot de passe incorrect.';
+          this.cdr.markForCheck();
         }
-      });
+    });
   }
 }

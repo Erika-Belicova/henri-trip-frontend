@@ -35,7 +35,6 @@ export class ActivityFormAdmin {
 
   isSaving = false;
   errorMessage = '';
-  showDiscardConfirmation = false;
   submitted = false;
 
   // form validation follows the backend ActivityRequestDTO constraints
@@ -100,27 +99,10 @@ export class ActivityFormAdmin {
     });
   }
 
-
-  // close the form or request confirmation if unsaved changes exist
+  // cancel and close the form
   cancel(): void {
     if (this.isSaving) return;
 
-    if (this.form.dirty) {
-      this.showDiscardConfirmation = true;
-      return;
-    }
-
-    this.cancelled.emit();
-  }
-
-  // keep editing and close the discard confirmation
-  cancelDiscard(): void {
-    this.showDiscardConfirmation = false;
-  }
-
-  // discard changes and close the creation form
-  confirmDiscard(): void {
-    this.showDiscardConfirmation = false;
     this.cancelled.emit();
   }
 

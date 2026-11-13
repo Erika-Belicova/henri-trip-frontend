@@ -20,7 +20,7 @@
 
   h1 {
     margin: 12px 0;
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 750;
     letter-spacing: -0.04em;
   }
@@ -28,14 +28,14 @@
   p {
     margin: 0;
     color: #64748b;
-    line-height: 1.7;
+    font-size: 1.1rem !important;
   }
 }
 
 .header-eyebrow,
 .section-eyebrow {
   color: #64748b;
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -64,7 +64,7 @@
 
 .overview-label {
   color: #64748b;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -77,19 +77,19 @@
 
   h2 {
     margin: 8px 0;
-    font-size: 1.45rem;
+    font-size: 1.8rem;
   }
 
   p {
     margin: 0;
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 0.1rem;
   }
 }
 
 .user-count {
   color: #64748b;
-  font-size: 0.8rem;
+  font-size: 0.1rem;
 }
 
 .search-container {
@@ -105,7 +105,7 @@
 
   > span {
     color: #94a3b8;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
   }
 
   input {
@@ -116,7 +116,7 @@
     background: transparent;
     color: #202b38;
     font: inherit;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   &:focus-within {
@@ -153,12 +153,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 46px;
-  height: 46px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: #eaf0ff;
   color: #4263c7;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 750;
 }
 
@@ -169,8 +169,9 @@
   h3 {
     margin: 0 0 7px;
     overflow-wrap: anywhere;
-    font-size: 0.92rem;
+    font-size: 1.3rem;
     font-weight: 700;
+    padding-bottom: 4px;
   }
 }
 
@@ -180,7 +181,7 @@
   border-radius: 5px;
   background: #f1f4f8;
   color: #475569;
-  font-size: 0.68rem;
+  font-size: 0.85rem;
   font-weight: 750;
   letter-spacing: 0.05em;
 }
@@ -202,7 +203,7 @@
   background: #fef2f2;
   color: #b91c1c;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
 
   &:hover {
     background: #fee2e2;
@@ -215,8 +216,8 @@
   margin: 20px 0;
   padding-bottom: 17px;
   border-bottom: 1px solid #eef0f3;
-  color: #94a3b8;
-  font-size: 0.78rem;
+  color: #373d46;
+  font-size: 1.2rem;
 
   strong {
     color: #475569;
@@ -241,7 +242,7 @@
   color: #334155;
   cursor: pointer;
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 1.2rem;
   font-weight: 650;
 
   &:hover {
@@ -260,7 +261,7 @@
   border-radius: 12px;
   background: #eaf0ff;
   color: #4263c7;
-  font-size: 0.7rem;
+  font-size: 1rem;
 }
 
 .accordion-arrow {
@@ -287,8 +288,8 @@
   gap: 10px;
   padding: 11px 0;
   border-bottom: 1px solid #eef0f3;
-  color: #475569;
-  font-size: 0.82rem;
+  color: #2b333f;
+  font-size: 1rem;
 
   &:last-child {
     border-bottom: 0;
@@ -302,7 +303,7 @@
 .no-guides {
   margin: 12px 0;
   color: #94a3b8;
-  font-size: 0.82rem;
+  font-size: 1rem;
 }
 
 .primary-action {
@@ -316,7 +317,7 @@
   border-radius: 7px;
   background: #263d70;
   color: #fff;
-  font-size: 0.83rem;
+  font-size: 1.2rem;
   font-weight: 650;
   text-decoration: none;
   cursor: pointer;
@@ -382,7 +383,7 @@
   border-radius: 8px;
   background: #fef2f2;
   color: #b91c1c;
-  font-size: 0.9rem;
+  font-size: 1rem;
 
   button {
     margin-left: 10px;
@@ -421,7 +422,7 @@
 
   > p {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 1rem;
     line-height: 1.7;
   }
 }

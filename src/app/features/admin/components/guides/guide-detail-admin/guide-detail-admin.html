@@ -1,6 +1,6 @@
 <div class="detail-container">
   <header class="detail-header">
-    <a routerLink="/admin/guides">← Retour aux guides</a>
+    <a routerLink="/admin/guides">← Retour à la gestion des guides</a>
   </header>
 
   @if (guideState$ | async; as state) {
@@ -11,7 +11,7 @@
     @if (state.errorMessage) {
       <p class="error-message">{{ state.errorMessage }}</p>
       <a routerLink="/admin/guides">
-        Return to guides
+        Retour à la gestion des guides
       </a>
     }
 

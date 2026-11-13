@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 import { UserService } from '../../../../../core/services/user.service';
 import { toErrorMessage } from '../../../../../core/error-message';
@@ -11,7 +11,7 @@ import { UserResponseDTO } from '../../../../../shared/interfaces/user/user-resp
 
 @Component({
   selector: 'app-user-form-admin',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './user-form-admin.html',
   styleUrl: './user-form-admin.scss',
 })

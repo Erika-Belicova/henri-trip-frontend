@@ -1,4 +1,17 @@
 <div class="form-container">
+
+  <header class="detail-header">
+    @if (isEditMode) {
+      <a [routerLink]="['/admin/guides', guideId]">
+        ← Retour au guide
+      </a>
+    } @else {
+      <a routerLink="/admin/guides">
+        ← Retour à la gestion des guides
+      </a>
+    }
+  </header>
+  
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
     <h1>{{ isEditMode ? 'Modifier un guide' : 'Créer un guide' }}</h1>
