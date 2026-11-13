@@ -1,0 +1,131 @@
+<div class="invitations-container">
+
+  <header class="invitations-header">
+    <h2>Inviter les utilisateurs</h2>
+    <p>
+      Choisissez les utilisateurs que vous souhaitez inviter à ce guide.
+    </p>
+  </header>
+
+  @if (errorMessage) {
+    <p class="error-message" role="alert">
+      {{ errorMessage }}
+    </p>
+  }
+
+  @if (successMessage) {
+    <p class="success-message" role="status">
+      {{ successMessage }}
+    </p>
+  }
+
+  @if (isLoading) {
+    <p>Chargement des utilisateurs...</p>
+  } @else {
+
+    <!-- Available users -->
+    <section class="invitation-section">
+
+      <h3>Utilisateurs disponibles</h3>
+
+      <input
+        type="search"
+        class="email-filter"
+        placeholder="Filtrer par email..."
+        [(ngModel)]="searchQuery">
+
+      <div class="user-scroll-list">
+
+        @for (user of availableUsers; track user.id) {
+          <label class="user-option">
+            <input
+              type="checkbox"
+              [checked]="selectedUserIds.has(user.id)"
+              (change)="toggleUser(user.id)">
+
+            <span>{{ user.email }}</span>
+          </label>
+        } @empty {
+          <p class="empty-message">
+            Aucun utilisateur disponible.
+          </p>
+        }
+
+      </div>
+
+      <button
+        type="button"
+        class="btn-invite"
+        [disabled]="selectedUserIds.size === 0 || isSending"
+        (click)="sendInvitations()">
+
+        {{ isSending ? 'Envoi...' : 'Envoyer les invitations' }}
+
+      </button>
+
+    </section>
+
+    <!-- Existing invitations -->
+    <section class="invitation-section">
+
+      <h3>Utilisateurs ayant accès à ce guide</h3>
+
+      <div class="user-scroll-list invited-list">
+
+        @for (invitation of invitations; track invitation.userId) {
+
+          <div class="invited-user">
+
+            <label class="user-option">
+              <input
+                type="checkbox"
+                [checked]="selectedInvitationIds.has(invitation.userId)"
+                (change)="toggleInvitation(invitation.userId)">
+
+              <span>{{ invitation.userEmail }}</span>
+            </label>
+
+            <button
+              type="button"
+              class="btn-remove-single"
+              aria-label="Retirer cet utilisateur"
+              title="Retirer cet utilisateur"
+              [disabled]="isRemoving"
+              (click)="removeInvitation(invitation.userId)">
+              ×
+            </button>
+
+          </div>
+
+        } @empty {
+          <p class="empty-message">
+            Aucun utilisateur n'a encore accès à ce guide.
+          </p>
+        }
+
+      </div>
+
+      <button
+        type="button"
+        class="btn-uninvite"
+        [disabled]="selectedInvitationIds.size === 0 || isRemoving"
+        (click)="removeSelectedInvitations()">
+
+        {{ isRemoving ? 'Suppression...' : 'Désinviter les utilisateurs sélectionnés' }}
+
+      </button>
+
+    </section>
+
+  }
+
+  <footer class="invitations-footer">
+    <button
+      type="button"
+      class="btn-close"
+      (click)="close()">
+      Fermer
+    </button>
+  </footer>
+
+</div>

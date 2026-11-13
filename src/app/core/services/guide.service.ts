@@ -7,6 +7,7 @@ import { GuideRequestDTO } from '../../shared/interfaces/guide/guide-request-dto
 import { GuideUpdateRequestDTO } from '../../shared/interfaces/guide/guide-update-request-dto';
 import { GuideResponseDTO } from '../../shared/interfaces/guide/guide-response-dto';
 import { GuideDayResponseDTO } from '../../shared/interfaces/guide/guide-day-response-dto';
+import { GuideInvitationResponseDTO } from '../../shared/interfaces/guide/guide-invitation-response-dto';
 import { Page } from '../../shared/interfaces/page';
 
 @Injectable({
@@ -84,6 +85,36 @@ export class GuideService {
       }));
 
     return { ...guide, days };
+  }
+
+  // retrieve all users assigned to a specific guide
+  getGuideInvitations(
+    guideId: number
+  ): Observable<GuideInvitationResponseDTO[]> {
+    return this.http.get<GuideInvitationResponseDTO[]>(
+      `${this.apiUrl}/${guideId}/invitations`
+    );
+  }
+
+  // invite a user to a guide
+  inviteUser(
+    guideId: number,
+    userId: number
+  ): Observable<GuideInvitationResponseDTO> {
+    return this.http.post<GuideInvitationResponseDTO>(
+      `${this.apiUrl}/${guideId}/invitations/${userId}`,
+      {}
+    );
+  }
+
+  // remove a user's access to a guide
+  removeInvitation(
+    guideId: number,
+    userId: number
+  ): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}/${guideId}/invitations/${userId}`
+    );
   }
 
 }

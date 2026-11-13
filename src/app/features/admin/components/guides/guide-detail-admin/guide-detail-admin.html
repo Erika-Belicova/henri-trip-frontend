@@ -31,8 +31,9 @@
       <section class="guide-information">
         <h2>Informations du guide</h2>
         <p>
-          <strong>Durée:</strong>
-          {{ guide.numberOfDays }} days
+          <strong>Durée :</strong>
+          {{ guide.numberOfDays }}
+          {{ guide.numberOfDays > 1 ? 'jours' : 'jour' }}
         </p>
 
         <div>
@@ -225,7 +226,7 @@
 
             <app-activity-form-admin
               [guideId]="guide.id"
-              [dayId]="selectedDayId"
+              [dayId]="selectedDayId!"
               [visitOrder]="selectedVisitOrder"
               (activityCreated)="onActivityCreated($event)"
               (cancelled)="closeActivityModal()">
@@ -257,14 +258,22 @@
         </div>
       }
 
-      <!-- delete action, at the bottom of the detail page -->
-      <section class="delete-section">
+      <section class="guide-actions">
+
+        <button
+          type="button"
+          class="btn-invite-users"
+          (click)="openInvitationsModal()">
+          Inviter les utilisateurs
+        </button>
+        <!-- delete action, at the bottom of the detail page -->
         <button
           type="button"
           class="btn-delete"
           (click)="openDeleteModal()">
           Supprimer ce guide
         </button>
+
       </section>
 
       <!-- activity deletion confirmation modal -->
@@ -359,6 +368,28 @@
                 {{ isDeleting ? 'Suppression...' : 'Supprimer définitivement' }}
               </button>
             </div>
+          </section>
+
+        </div>
+      }
+
+      @if (showInvitationsModal) {
+        <div
+          class="modal-overlay"
+          (click)="closeInvitationsModal()">
+
+          <section
+            class="activity-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Inviter les utilisateurs"
+            (click)="$event.stopPropagation()">
+
+            <app-guide-invitations-admin
+              [guideId]="guide.id"
+              (closed)="closeInvitationsModal()">
+            </app-guide-invitations-admin>
+
           </section>
 
         </div>

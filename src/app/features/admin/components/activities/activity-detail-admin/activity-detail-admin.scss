@@ -1,111 +1,173 @@
 
+:host {
+  display: block;
+  color: #202b38;
+}
+
 .activity-details {
-  padding: 1.5rem;
-  background: #fff;
+  width: 100%;
+  max-width: 750px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 2rem;
+  background: #f7f8fa;
+  border: 1px solid #e0dede;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
 }
 
 .activity-details-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #ddd;
-}
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e0dede;
 
-.activity-details-header h2 {
-  margin: 0;
+  h2 {
+    margin: 0 0 0.6rem;
+    color: #404b5a;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 750;
+    letter-spacing: -0.03em;
+  }
 }
 
 .btn-close {
-  border: none;
-  background: transparent;
-  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #e0dede;
+  border-radius: 8px;
+  background: #fff;
+  color: #353434;
+  font-size: 1.5rem;
   cursor: pointer;
-  color: #666;
+
+  &:hover {
+    background: #f1f4f8;
+  }
 }
 
 .activity-section {
-  padding: 1.2rem 0;
-  border-bottom: 1px solid #eee;
-}
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  background: #fff;
+  border: 1px solid #e0dede;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.035);
 
-.activity-section h3 {
-  margin: 0 0 1rem;
-  font-size: 1.1rem;
-}
+  h3 {
+    margin: 0 0 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
 
-.activity-section > p {
-  margin: 0;
-  line-height: 1.6;
+  > p {
+    margin: 0;
+    color: #595959;
+    line-height: 1.7;
+  }
 }
 
 .information-item {
-  margin-bottom: 1rem;
-}
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid #eef0f3;
 
-.information-item:last-child {
-  margin-bottom: 0;
-}
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
 
-.information-item span {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-weight: 500;
-}
+  span {
+    flex-shrink: 0;
+    color: #263d70;
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
 
-.information-item p {
-  margin: 0;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
+  p {
+    margin: 0;
+    color: #353434;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
 
-.information-item a {
-  color: #2563eb;
-  text-decoration: none;
-}
+  a {
+    color: #263d70;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
 
-.information-item a:hover {
-  text-decoration: underline;
+    &:hover {
+      color: #1c305b;
+    }
+  }
 }
 
 .empty-value {
-  color: #888;
-  font-style: italic;
+  color: #595959 !important;
+}
+
+.empty-value {
+  color: #595959 !important;
 }
 
 .activity-details-footer {
   display: flex;
   justify-content: flex-end;
   margin-top: 1.5rem;
+
+  button {
+    min-width: 130px;
+    padding: 0.8rem 1.4rem;
+    border: none;
+    border-radius: 8px;
+    background: #263d70;
+    color: #fff;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #1c305b;
+    }
+  }
 }
 
-.activity-details-footer button {
-  padding: 0.7rem 1.2rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-  font: inherit;
-}
+@media (max-width: 600px) {
+  .activity-details {
+    padding: 1.25rem;
+  }
 
-.activity-type-label {
-  display: block;
-  margin-bottom: 0.4rem;
-  color: #666;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
+  .activity-section {
+    padding: 1.1rem;
+  }
 
-.activity-details-header h2 {
-  margin: 0 0 0.5rem;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.activity-details-header h3 {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #222;
+  .activity-details-header h3 {
+    font-size: 1.35rem;
+  }
 }

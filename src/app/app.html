@@ -3,7 +3,9 @@
 
   @if (authService.isAuthenticated()) {
     <nav class="session">
-      <a routerLink="/guides">Guides</a>
+      <a routerLink="/admin/guides">Gestion des guides</a>
+
+      <a routerLink="/admin/users">Gestion des utilisateurs</a>
 
       <span class="session-email">
         {{ authService.getCurrentUser()?.email }}
@@ -20,5 +22,7 @@
 </header>
 
 <main class="page">
-  <router-outlet />
+  <div class="page-container">
+    <router-outlet />
+  </div>
 </main>

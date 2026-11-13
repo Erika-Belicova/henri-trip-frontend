@@ -16,6 +16,7 @@ import { GuideResponseDTO } from '../../../../../shared/interfaces/guide/guide-r
 
 import { ActivityFormAdmin } from '../../activities/activity-form-admin/activity-form-admin';
 import { ActivityDetailAdmin } from '../../activities/activity-detail-admin/activity-detail-admin';
+import { GuideInvitationsAdmin } from '../guide-invitations-admin/guide-invitations-admin';
 
 import {
   TRANSPORT_LABELS, SEASON_LABELS, 
@@ -32,7 +33,8 @@ type GuideDay = GuideResponseDTO['days'][number];
     RouterLink,
     DragDropModule,
     ActivityFormAdmin,
-    ActivityDetailAdmin
+    ActivityDetailAdmin,
+    GuideInvitationsAdmin
   ],
   templateUrl: './guide-detail-admin.html',
   styleUrl: './guide-detail-admin.scss',
@@ -76,6 +78,9 @@ export class GuideDetailAdmin {
   showActivityDeleteModal = false;
   isDeletingActivity = false;
   activityDeleteErrorMessage = '';
+
+  // guide invitations modal
+  showInvitationsModal = false;
 
   // activity detail modal
   selectedActivityDetails: ActivityResponseDTO | null = null;
@@ -462,5 +467,15 @@ export class GuideDetailAdmin {
   // close activity details
   closeActivityDetails(): void {
     this.selectedActivityDetails = null;
+  }
+
+  // open invitations modal
+  openInvitationsModal(): void {
+    this.showInvitationsModal = true;
+  }
+
+  // close invitations modal
+  closeInvitationsModal(): void {
+    this.showInvitationsModal = false;
   }
 }
