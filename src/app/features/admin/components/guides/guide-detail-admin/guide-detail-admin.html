@@ -15,7 +15,7 @@
       </a>
     }
 
-    @if (state.guide; as guide) {
+    @if (currentGuide$ | async; as guide) {
       <section class="guide-header">
         <div>
           <h1>{{ guide.title }}</h1>

@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
-import { catchError, map, of, startWith, switchMap, Subject } from 'rxjs';
+import { catchError, map, of, startWith, switchMap, BehaviorSubject } from 'rxjs';
 
 import { GuideService } from '../../../../../core/services/guide.service';
 import { ActivityService } from '../../../../../core/services/activity.service';
@@ -10,6 +10,7 @@ import { toErrorMessage } from '../../../../../core/error-message';
 import type { GuideDetailState } from './../../../../../shared/interfaces/guide/guide-detail-state';
 
 import { ActivityResponseDTO } from '../../../../../shared/interfaces/activity/activity-response-dto';
+import { GuideResponseDTO } from '../../../../../shared/interfaces/guide/guide-response-dto';
 import { ActivityFormAdmin } from '../../activities/activity-form-admin/activity-form-admin';
 
 import {
@@ -28,6 +29,9 @@ export class GuideDetailAdmin {
   private readonly guideService = inject(GuideService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly guideSubject = new BehaviorSubject<GuideResponseDTO | null>(null);
+
+  readonly currentGuide$ = this.guideSubject.asObservable();
 
   transportLabels = TRANSPORT_LABELS;
   seasonLabels = SEASON_LABELS;
@@ -53,6 +57,7 @@ export class GuideDetailAdmin {
   isDeletingActivity = false;
   activityDeleteErrorMessage = '';
 
+
   selectedActivity: {
     guideId: number;
     dayId: number;
@@ -61,7 +66,6 @@ export class GuideDetailAdmin {
   } | null = null;
 
   private readonly activityService = inject(ActivityService);
-  private readonly refreshGuide$ = new Subject<void>();
 
   // retrieve the guide ID from route changes and load the corresponding guide
   readonly guideState$ = this.route.paramMap.pipe(
@@ -75,27 +79,29 @@ export class GuideDetailAdmin {
           errorMessage: 'Identifiant du guide invalide.'
         } satisfies GuideDetailState);
       }
-      return this.refreshGuide$.pipe(
-        startWith(undefined),
-        switchMap(() => this.guideService.getGuideById(id).pipe(
-          map((guide): GuideDetailState => ({
+
+      return this.guideService.getGuideById(id).pipe(
+        map((guide): GuideDetailState => {
+          this.guideSubject.next(guide);
+
+          return {
             guide,
             isLoading: false,
             errorMessage: ''
-          })),
+          };
+        }),
 
-          startWith({
-            guide: null,
-            isLoading: true,
-            errorMessage: ''
-          }),
+        startWith({
+          guide: null,
+          isLoading: true,
+          errorMessage: ''
+        }),
 
-          catchError((err: unknown) => of({
-            guide: null,
-            isLoading: false,
-            errorMessage: toErrorMessage(err)
-          }))
-        ))
+        catchError((err: unknown) => of({
+          guide: null,
+          isLoading: false,
+          errorMessage: toErrorMessage(err)
+        }))
       );
     })
   );
@@ -195,6 +201,36 @@ export class GuideDetailAdmin {
     this.activityDeleteErrorMessage = '';
   }
 
+  // refresh only the activities belonging to the affected day
+  private refreshDayActivities(guideId: number, dayId: number): void {
+    this.activityService.getActivities(guideId, dayId).subscribe({
+      next: (activities) => {
+        const guide = this.guideSubject.value;
+
+        if (!guide) return;
+
+        const updatedGuide: GuideResponseDTO = {
+          ...guide,
+          days: guide.days.map(day =>
+            day.id === dayId
+              ? { ...day, activities }
+              : day
+          )
+        };
+
+        this.guideSubject.next(updatedGuide);
+
+        this.isDeletingActivity = false;
+        this.showActivityDeleteModal = false;
+        this.selectedActivity = null;
+      },
+      error: (err: unknown) => {
+        this.activityDeleteErrorMessage = toErrorMessage(err);
+        this.isDeletingActivity = false;
+      }
+    });
+  }
+
   // delete activity after confirmation
   deleteActivity(): void {
     if (this.isDeletingActivity || !this.selectedActivity) return;
@@ -210,12 +246,7 @@ export class GuideDetailAdmin {
       activityId
     ).subscribe({
       next: () => {
-        this.isDeletingActivity = false;
-        this.showActivityDeleteModal = false;
-        this.selectedActivity = null;
-
-        // reload the guide and its itinerary
-        this.refreshGuide$.next();
+        this.refreshDayActivities(guideId, dayId);
       },
       error: (err: unknown) => {
         this.activityDeleteErrorMessage = toErrorMessage(err);
