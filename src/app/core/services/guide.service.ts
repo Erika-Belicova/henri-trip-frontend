@@ -96,4 +96,25 @@ export class GuideService {
     );
   }
 
+  // invite a user to a guide
+  inviteUser(
+    guideId: number,
+    userId: number
+  ): Observable<GuideInvitationResponseDTO> {
+    return this.http.post<GuideInvitationResponseDTO>(
+      `${this.apiUrl}/${guideId}/invitations/${userId}`,
+      {}
+    );
+  }
+
+  // remove a user's access to a guide
+  removeInvitation(
+    guideId: number,
+    userId: number
+  ): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}/${guideId}/invitations/${userId}`
+    );
+  }
+
 }

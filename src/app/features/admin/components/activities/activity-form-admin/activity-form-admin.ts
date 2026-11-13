@@ -48,7 +48,7 @@ export class ActivityFormAdmin {
     openingHours: ['', [Validators.maxLength(500)]],
     website: ['', [
       Validators.maxLength(2048),
-      Validators.pattern(/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+([/?#].*)?$/)
+      Validators.pattern(/^(https?:\/\/).+/i)
     ]]
   });
 
@@ -58,6 +58,13 @@ export class ActivityFormAdmin {
 
     if (this.form.invalid || this.isSaving) {
       this.form.markAllAsTouched();
+      return;
+    }
+
+    const visitOrder = this.visitOrder();
+
+    if (!Number.isInteger(visitOrder) || visitOrder < 1) {
+      this.errorMessage = 'La position de cette activité est invalide.';
       return;
     }
 
@@ -74,7 +81,7 @@ export class ActivityFormAdmin {
       phoneNumber: formValue.phoneNumber?.trim() || null,
       openingHours: formValue.openingHours?.trim() || null,
       website: this.normalizeWebsite(formValue.website),
-      visitOrder: this.visitOrder()
+      visitOrder
     };
 
     this.activityService.createActivity(
@@ -92,6 +99,7 @@ export class ActivityFormAdmin {
       }
     });
   }
+
 
   // close the form or request confirmation if unsaved changes exist
   cancel(): void {
