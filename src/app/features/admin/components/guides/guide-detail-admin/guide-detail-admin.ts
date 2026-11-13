@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+
 import { catchError, map, of, startWith, switchMap, BehaviorSubject } from 'rxjs';
 
 import { GuideService } from '../../../../../core/services/guide.service';
@@ -11,26 +13,39 @@ import type { GuideDetailState } from './../../../../../shared/interfaces/guide/
 
 import { ActivityResponseDTO } from '../../../../../shared/interfaces/activity/activity-response-dto';
 import { GuideResponseDTO } from '../../../../../shared/interfaces/guide/guide-response-dto';
+
 import { ActivityFormAdmin } from '../../activities/activity-form-admin/activity-form-admin';
 import { ActivityDetailAdmin } from '../../activities/activity-detail-admin/activity-detail-admin';
 
 import {
-  TRANSPORT_LABELS, SEASON_LABELS,
+  TRANSPORT_LABELS, SEASON_LABELS, 
   AUDIENCE_LABELS, CATEGORY_LABELS
 } from '../../../../../shared/labels';
 
+// derive the guide day type from the guide response DTO
+type GuideDay = GuideResponseDTO['days'][number];
+
 @Component({
   selector: 'app-guide-detail-admin',
-  imports: [AsyncPipe, RouterLink, ActivityFormAdmin, ActivityDetailAdmin],
+  imports: [
+    AsyncPipe,
+    RouterLink,
+    DragDropModule,
+    ActivityFormAdmin,
+    ActivityDetailAdmin
+  ],
   templateUrl: './guide-detail-admin.html',
   styleUrl: './guide-detail-admin.scss',
 })
 export class GuideDetailAdmin {
 
   private readonly guideService = inject(GuideService);
+  private readonly activityService = inject(ActivityService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly guideSubject = new BehaviorSubject<GuideResponseDTO | null>(null);
+
+  private readonly guideSubject =
+    new BehaviorSubject<GuideResponseDTO | null>(null);
 
   readonly currentGuide$ = this.guideSubject.asObservable();
 
@@ -43,7 +58,11 @@ export class GuideDetailAdmin {
   isItineraryEditMode = false;
   showLeaveEditConfirmation = false;
 
-  // control the visibility and loading state of the deletion modal
+  // drag and drop state
+  isMovingActivity = false;
+  moveErrorMessage = '';
+
+  // guide deletion modal
   showDeleteModal = false;
   isDeleting = false;
   deleteErrorMessage = '';
@@ -53,7 +72,7 @@ export class GuideDetailAdmin {
   selectedDayId: number | null = null;
   selectedVisitOrder = 0;
 
-  // activity deletion confirmation modal
+  // activity deletion modal
   showActivityDeleteModal = false;
   isDeletingActivity = false;
   activityDeleteErrorMessage = '';
@@ -68,9 +87,7 @@ export class GuideDetailAdmin {
     title: string;
   } | null = null;
 
-  private readonly activityService = inject(ActivityService);
-
-  // retrieve the guide ID from route changes and load the corresponding guide
+  // retrieve the guide ID and load the corresponding guide
   readonly guideState$ = this.route.paramMap.pipe(
     map(params => params.get('id')),
     map(id => Number(id)),
@@ -117,24 +134,49 @@ export class GuideDetailAdmin {
   // leave itinerary editing mode
   leaveItineraryEditMode(): void {
     this.isItineraryEditMode = false;
+    this.moveErrorMessage = '';
   }
 
   // open activity creation modal for the selected day
-  openActivityModal(dayId: number, activities: ActivityResponseDTO[]): void {
-    if (!this.isItineraryEditMode) return;
+  openActivityModal(
+    dayId: number,
+    activities: ActivityResponseDTO[]
+  ): void {
+    if (!this.isItineraryEditMode || this.isMovingActivity) return;
 
     this.selectedDayId = dayId;
 
     this.selectedVisitOrder = activities.length > 0
       ? Math.max(...activities.map(activity => activity.visitOrder)) + 1
-      : 1; // order of the first activity
+      : 1;
 
     this.showActivityModal = true;
   }
 
   // handle successful activity creation
-  onActivityCreated(): void {
+  onActivityCreated(activity: ActivityResponseDTO): void {
+    const guide = this.guideSubject.value;
+    const dayId = this.selectedDayId;
+
+    if (guide && dayId !== null) {
+      const updatedGuide: GuideResponseDTO = {
+        ...guide,
+        days: guide.days.map(day =>
+          day.id === dayId
+            ? {
+                ...day,
+                activities: [...day.activities, activity]
+                  .sort((a, b) => a.visitOrder - b.visitOrder)
+              }
+            : day
+        )
+      };
+
+      this.guideSubject.next(updatedGuide);
+    }
+
     this.closeActivityModal();
+    this.selectedActivityDetails = activity;
   }
 
   // close activity creation modal
@@ -143,13 +185,162 @@ export class GuideDetailAdmin {
     this.selectedDayId = null;
   }
 
-  // open the confirmation modal before deleting the guide
+  // handle activity drag and drop
+  dropActivity(
+    event: CdkDragDrop<GuideDay, GuideDay, ActivityResponseDTO>,
+    targetDayId: number
+  ): void {
+
+    if (
+      !this.isItineraryEditMode ||
+      this.isMovingActivity ||
+      !event.previousContainer ||
+      !event.container
+    ) {
+      return;
+    }
+
+    // ignore drops that do not change the position
+    if (
+      event.previousContainer === event.container &&
+      event.previousIndex === event.currentIndex
+    ) {
+      return;
+    }
+
+    const guide = this.guideSubject.value;
+
+    if (!guide) return;
+
+    // keep the original guide so we can restore it if the API fails
+    const originalGuide = guide;
+
+    const sourceDayId = event.previousContainer.data.id;
+
+    // create independent copies before changing the activity arrays
+    const updatedDays: GuideDay[] = guide.days.map(day => ({
+      ...day,
+      activities: [...day.activities]
+    }));
+
+    const sourceDay = updatedDays.find(
+      day => day.id === sourceDayId
+    );
+
+    const targetDay = updatedDays.find(
+      day => day.id === targetDayId
+    );
+
+    if (!sourceDay || !targetDay) return;
+
+    const movedActivity = sourceDay.activities[event.previousIndex];
+
+    if (!movedActivity) return;
+
+    // update the local itinerary immediately
+    if (sourceDayId === targetDayId) {
+
+      // reorder within the same day
+      moveItemInArray(
+        targetDay.activities,
+        event.previousIndex,
+        event.currentIndex
+      );
+
+    } else {
+
+      // move between two different days
+      transferArrayItem(
+        sourceDay.activities,
+        targetDay.activities,
+        event.previousIndex,
+        event.currentIndex
+      );
+
+      // recalculate the source day's order
+      this.updateVisitOrders(sourceDay);
+    }
+
+    // recalculate the destination day's order
+    this.updateVisitOrders(targetDay);
+
+    // display the updated itinerary immediately
+    this.guideSubject.next({
+      ...guide,
+      days: updatedDays
+    });
+
+    this.isMovingActivity = true;
+    this.moveErrorMessage = '';
+
+    // persist the change using the existing backend endpoint
+    this.activityService.moveActivity(
+      guide.id,
+      sourceDayId,
+      movedActivity.id,
+      {
+        targetDayId: targetDayId,
+        visitOrder: event.currentIndex + 1
+      }
+    ).subscribe({
+
+      next: (updatedActivity) => {
+
+        // replace the moved activity with the server response
+        const currentGuide = this.guideSubject.value;
+
+        if (currentGuide) {
+          const confirmedDays = currentGuide.days.map(day => {
+
+            if (day.id !== targetDayId) return day;
+
+            return {
+              ...day,
+              activities: day.activities
+                .map(activity =>
+                  activity.id === updatedActivity.id
+                    ? updatedActivity
+                    : activity
+                )
+                .sort((a, b) => a.visitOrder - b.visitOrder)
+            };
+          });
+
+          this.guideSubject.next({
+            ...currentGuide,
+            days: confirmedDays
+          });
+        }
+
+        this.isMovingActivity = false;
+      },
+
+      error: (err: unknown) => {
+
+        // restore the original itinerary if the request fails
+        this.guideSubject.next(originalGuide);
+
+        this.moveErrorMessage = toErrorMessage(err);
+        this.isMovingActivity = false;
+      }
+    });
+  }
+
+  // recalculate consecutive visit orders starting at 1
+  private updateVisitOrders(day: GuideDay): void {
+    day.activities = day.activities.map((activity, index) => ({
+      ...activity,
+      visitOrder: index + 1
+    }));
+  }
+
+  // open confirmation modal before deleting the guide
   openDeleteModal(): void {
     this.deleteErrorMessage = '';
     this.showDeleteModal = true;
   }
 
-  // close the modal without deleting the guide
+  // close guide deletion modal
   closeDeleteModal(): void {
     if (this.isDeleting) return;
 
@@ -157,7 +348,7 @@ export class GuideDetailAdmin {
     this.deleteErrorMessage = '';
   }
 
-  // delete the guide after confirmation and return to the guide list
+  // delete guide and return to guide list
   deleteGuide(guideId: number): void {
     if (this.isDeleting) return;
 
@@ -182,7 +373,7 @@ export class GuideDetailAdmin {
     activityId: number,
     title: string
   ): void {
-    if (!this.isItineraryEditMode) return;
+    if (!this.isItineraryEditMode || this.isMovingActivity) return;
 
     this.selectedActivity = {
       guideId,
@@ -204,8 +395,11 @@ export class GuideDetailAdmin {
     this.activityDeleteErrorMessage = '';
   }
 
-  // refresh only the activities belonging to the affected day
-  private refreshDayActivities(guideId: number, dayId: number): void {
+  // refresh activities belonging to the affected day
+  private refreshDayActivities(
+    guideId: number,
+    dayId: number
+  ): void {
     this.activityService.getActivities(guideId, dayId).subscribe({
       next: (activities) => {
         const guide = this.guideSubject.value;
@@ -227,6 +421,7 @@ export class GuideDetailAdmin {
         this.showActivityDeleteModal = false;
         this.selectedActivity = null;
       },
+
       error: (err: unknown) => {
         this.activityDeleteErrorMessage = toErrorMessage(err);
         this.isDeletingActivity = false;
@@ -251,6 +446,7 @@ export class GuideDetailAdmin {
       next: () => {
         this.refreshDayActivities(guideId, dayId);
       },
+
       error: (err: unknown) => {
         this.activityDeleteErrorMessage = toErrorMessage(err);
         this.isDeletingActivity = false;

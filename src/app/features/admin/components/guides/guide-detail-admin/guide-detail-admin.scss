@@ -280,6 +280,182 @@
   box-shadow: none;
 }
 
+/* drag and drop instructions */
+
+.drag-instructions {
+  margin: 0 0 1.5rem;
+  padding: 1rem;
+  border-radius: 6px;
+  background: #eef5ff;
+  color: #345477;
+  line-height: 1.5;
+}
+
+.drag-instructions span {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+/* itinerary drop zones */
+
+.itinerary-days {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.day-card {
+  min-height: 120px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* highlight a day when an activity is dragged over it */
+
+.day-card.cdk-drop-list-receiving {
+  border: 2px dashed #477dcc;
+  background: #f1f6ff;
+}
+
+/* draggable activity cards */
+
+.activity-card {
+  position: relative;
+  cursor: default;
+  transition: box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.activity-card.cdk-drag {
+  cursor: grab;
+}
+
+.activity-card.cdk-drag:active {
+  cursor: grabbing;
+}
+
+.activity-card.cdk-drag-disabled {
+  cursor: default;
+}
+
+/* activity title and drag handle */
+
+.activity-title-container {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 32px;
+  color: #888;
+  font-size: 1.5rem;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.drag-handle:hover {
+  color: #333;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* dragging animation */
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  opacity: 0.95;
+}
+
+.activity-drag-preview {
+  padding: 1rem;
+  border-left: 3px solid #477dcc;
+  border-radius: 4px;
+  background: white;
+  font-weight: 600;
+}
+
+/* placeholder indicating the destination position */
+
+.activity-drag-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 65px;
+  margin-top: 1rem;
+  border: 2px dashed #477dcc;
+  border-radius: 6px;
+  background: #eef5ff;
+  color: #477dcc;
+  font-size: 0.9rem;
+}
+
+/* smooth movement of surrounding activities */
+
+.cdk-drop-list-dragging .activity-card:not(.cdk-drag-placeholder) {
+  transition: transform 200ms ease;
+}
+
+/* Empty day drop zone */
+
+.empty-day-message {
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  color: #777;
+}
+
+/* disable buttons while a move is being saved */
+
+.btn-add-activity:disabled,
+.btn-activity-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.activity-title-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.activity-order {
+  flex-shrink: 0;
+  font-size: 1;
+  font-weight: 600;
+}
+
+/* slow down the drop animation */
+.activity-card {
+  transition: transform 500ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* mobile drag and drop */
+
+@media (max-width: 600px) {
+  .drag-instructions {
+    font-size: 0.9rem;
+  }
+
+  .activity-card {
+    padding: 0.8rem;
+  }
+
+  .drag-handle {
+    width: 24px;
+  }
+}
+
 @media (max-width: 600px) {
   .activity-modal-overlay {
     padding: 0;

@@ -83,59 +83,136 @@
             </button>
           }
         </div>
-        @for (day of guide.days; track day.id) {
-          <article class="day-card">
-            <h3>Jour {{ day.dayNumber }}</h3>
 
-            @if (day.activities.length === 0) {
-              <p>Aucune activité prévue pour cette journée.</p>
-            }
+        @if (isItineraryEditMode) {
+          <p class="drag-instructions">
+            <span aria-hidden="true">↕</span>
+            Créez vos activités, puis faites-les glisser pour choisir
+            leur position dans la journée. Vous pouvez également les
+            déplacer d'un jour à l'autre.
+          </p>
+        }
 
-            @for (activity of day.activities; track activity.id) {
-              <div class="activity-card">
-                <div class="activity-card-header">
-                  <h4>{{ activity.title }}</h4>
+        @if (moveErrorMessage) {
+          <p class="error-message" role="alert">
+            {{ moveErrorMessage }}
+          </p>
+        }
 
-                  @if (isItineraryEditMode) {
-                    <button
-                      type="button"
-                      class="btn-activity-delete"
-                      aria-label="Supprimer cette activité"
-                      title="Supprimer cette activité"
-                      (click)="openActivityDeleteModal(
-                        guide.id,
-                        day.id,
-                        activity.id,
-                        activity.title
-                      )">
-                      X
-                    </button>
-                  }
+        <div
+          cdkDropListGroup
+          class="itinerary-days">
+
+          @for (day of guide.days; track day.id) {
+            <article
+              class="day-card"
+              cdkDropList
+              [cdkDropListData]="day"
+              [cdkDropListDisabled]="
+                !isItineraryEditMode || isMovingActivity
+              "
+              (cdkDropListDropped)="dropActivity($event, day.id)">
+
+              <h3>Jour {{ day.dayNumber }}</h3>
+
+              @if (day.activities.length === 0) {
+                <p class="empty-day-message">
+                  Aucune activité prévue pour cette journée.
+                </p>
+              }
+
+              @for (activity of day.activities; track activity.id) {
+                <div
+                  class="activity-card"
+                  cdkDrag
+                  [cdkDragData]="activity"
+                  [cdkDragDisabled]="
+                    !isItineraryEditMode || isMovingActivity
+                  ">
+
+                  <div class="activity-card-header">
+
+                    <div class="activity-title-container">
+
+                      @if (isItineraryEditMode) {
+                        <span
+                          class="drag-handle"
+                          cdkDragHandle
+                          aria-label="Déplacer cette activité"
+                          title="Glisser pour déplacer">
+                          ⠿
+                        </span>
+                      }
+
+                      <span class="activity-order">
+                        {{ activity.visitOrder }}.
+                      </span>
+
+                      <h4>{{ activity.title }}</h4>
+
+                    </div>
+
+                    @if (isItineraryEditMode) {
+                      <button
+                        type="button"
+                        class="btn-activity-delete"
+                        aria-label="Supprimer cette activité"
+                        title="Supprimer cette activité"
+                        [disabled]="isMovingActivity"
+                        (click)="openActivityDeleteModal(
+                          guide.id,
+                          day.id,
+                          activity.id,
+                          activity.title
+                        )">
+                        X
+                      </button>
+                    }
+
+                  </div>
+
+                  <p>{{ activity.description }}</p>
+
+                  <button
+                    type="button"
+                    class="btn-view-details"
+                    (click)="openActivityDetails(activity)">
+                    Voir les détails
+                  </button>
+
+                  <!-- custom preview displayed while dragging -->
+                  <ng-template cdkDragPreview>
+                    <div class="activity-drag-preview">
+                      {{ activity.title }}
+                    </div>
+                  </ng-template>
+
+                  <!-- placeholder showing the destination position -->
+                  <ng-template cdkDragPlaceholder>
+                    <div class="activity-drag-placeholder">
+                      Déposer ici
+                    </div>
+                  </ng-template>
+
                 </div>
+              }
 
-                <p>{{ activity.description }}</p>
-
+              @if (isItineraryEditMode) {
                 <button
                   type="button"
-                  class="btn-view-details"
-                  (click)="openActivityDetails(activity)">
-                  Voir les détails
+                  class="btn-add-activity"
+                  [disabled]="isMovingActivity"
+                  (click)="openActivityModal(day.id, day.activities)">
+                  + Ajouter une activité
                 </button>
-              </div>
-            }
+              }
 
-            @if (isItineraryEditMode) {
-              <button
-                type="button"
-                class="btn-add-activity"
-                (click)="openActivityModal(day.id, day.activities)">
-                + Ajouter une activité
-              </button>
-            }
-          </article>
-        } @empty {
-          <p>Aucun itinéraire n'a encore été ajouté.</p>
-        }
+            </article>
+          } @empty {
+            <p>Aucun itinéraire n'a encore été ajouté.</p>
+          }
+
+        </div>
       </section>
 
       @if (showActivityModal && selectedDayId !== null) {
@@ -150,7 +227,7 @@
               [guideId]="guide.id"
               [dayId]="selectedDayId"
               [visitOrder]="selectedVisitOrder"
-              (activityCreated)="onActivityCreated()"
+              (activityCreated)="onActivityCreated($event)"
               (cancelled)="closeActivityModal()">
             </app-activity-form-admin>
 
