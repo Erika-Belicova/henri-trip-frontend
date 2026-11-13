@@ -186,3 +186,17 @@ button:disabled {
     }
   }
 }
+
+.detail-header {
+  margin-bottom: 30px;
+
+  a {
+    color: #263d70;
+    font-weight: 650;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

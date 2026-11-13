@@ -17,7 +17,13 @@ export class NotFound {
 
   // navigate to main page based on authentication
   navigateHome(): void {
-    this.router.navigate([this.authService.isAuthenticated() ? '/guides' : '/login']);
-  }
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);
+      return;
+    }
 
+    this.router.navigate([
+      this.authService.isAdmin() ? '/admin' : '/guides'
+    ]);
+  }
 }

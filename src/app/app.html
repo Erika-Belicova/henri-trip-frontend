@@ -1,10 +1,15 @@
 <header class="topbar">
-  <a class="brand" routerLink="/guides">Henri Trip</a>
+  <a
+    class="brand"
+    [routerLink]="authService.isAdmin() ? '/admin' : '/guides'">
+    Henri Trip
+  </a>
 
   @if (authService.isAuthenticated()) {
     <nav class="session">
 
       @if (authService.getCurrentUser()?.role === 'ADMIN') {
+        <a routerLink="/admin">Tableau de bord</a>
         <a routerLink="/admin/guides">Gestion des guides</a>
         <a routerLink="/admin/users">Gestion des utilisateurs</a>
       } @else {
