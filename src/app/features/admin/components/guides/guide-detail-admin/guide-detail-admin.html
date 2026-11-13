@@ -15,7 +15,7 @@
       </a>
     }
 
-    @if (state.guide; as guide) {
+    @if (currentGuide$ | async; as guide) {
       <section class="guide-header">
         <div>
           <h1>{{ guide.title }}</h1>
@@ -64,64 +64,198 @@
       </section>
 
       <section class="itinerary">
-        <h2>Itinéraire</h2>
-        @for (day of guide.days; track day.id) {
-          <article class="day-card">
-            <h3>Jour {{ day.dayNumber }}</h3>
+        <div class="itinerary-header">
+          <h2>Itinéraire</h2>
 
-            @if (day.activities.length === 0) {
-              <p>	Aucune activité prévue pour cette journée.</p>
-            }
+          @if (isItineraryEditMode) {
+            <button
+              type="button"
+              class="btn-edit"
+              (click)="leaveItineraryEditMode()">
+              Voir l'itinéraire
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn-edit"
+              (click)="enterItineraryEditMode()">
+              Modifier l'itinéraire
+            </button>
+          }
+        </div>
 
-            @for (activity of day.activities; track activity.id) {
-              <div class="activity-card">
-                <h4>{{ activity.title }}</h4>
-                <p>{{ activity.description }}</p>
-                <p>
-                  <strong>Catégorie :</strong>
-                  {{ categoryLabels[activity.category] }}
-                </p>
-
-                @if (activity.address) {
-                  <p>
-                    <strong>Adresse:</strong>
-                    {{ activity.address }}
-                  </p>
-                }
-
-                @if (activity.phoneNumber) {
-                  <p>
-                    <strong>Téléphone:</strong>
-                    {{ activity.phoneNumber }}
-                  </p>
-                }
-
-                @if (activity.openingHours) {
-                  <p>
-                    <strong>Horaires d'ouverture:</strong>
-                    {{ activity.openingHours }}
-                  </p>
-                }
-
-                @if (activity.website) {
-                  <p>
-                    <strong>Site internet:</strong>
-                    <a
-                      [href]="activity.website"
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      Visiter le site internet
-                    </a>
-                  </p>
-                }
-              </div>
-            }
-          </article>
-
-        } @empty {
-          <p>Aucun itinéraire n'a encore été ajouté.</p>
+        @if (isItineraryEditMode) {
+          <p class="drag-instructions">
+            <span aria-hidden="true">↕</span>
+            Créez vos activités, puis faites-les glisser pour choisir
+            leur position dans la journée. Vous pouvez également les
+            déplacer d'un jour à l'autre.
+          </p>
         }
+
+        @if (moveErrorMessage) {
+          <p class="error-message" role="alert">
+            {{ moveErrorMessage }}
+          </p>
+        }
+
+        <div
+          cdkDropListGroup
+          class="itinerary-days">
+
+          @for (day of guide.days; track day.id) {
+            <article
+              class="day-card"
+              cdkDropList
+              [cdkDropListData]="day"
+              [cdkDropListDisabled]="
+                !isItineraryEditMode || isMovingActivity
+              "
+              (cdkDropListDropped)="dropActivity($event, day.id)">
+
+              <h3>Jour {{ day.dayNumber }}</h3>
+
+              @if (day.activities.length === 0) {
+                <p class="empty-day-message">
+                  Aucune activité prévue pour cette journée.
+                </p>
+              }
+
+              @for (activity of day.activities; track activity.id) {
+                <div
+                  class="activity-card"
+                  cdkDrag
+                  [cdkDragData]="activity"
+                  [cdkDragDisabled]="
+                    !isItineraryEditMode || isMovingActivity
+                  ">
+
+                  <div class="activity-card-header">
+
+                    <div class="activity-title-container">
+
+                      @if (isItineraryEditMode) {
+                        <span
+                          class="drag-handle"
+                          cdkDragHandle
+                          aria-label="Déplacer cette activité"
+                          title="Glisser pour déplacer">
+                          ⠿
+                        </span>
+                      }
+
+                      <span class="activity-order">
+                        {{ activity.visitOrder }}.
+                      </span>
+
+                      <h4>{{ activity.title }}</h4>
+
+                    </div>
+
+                    @if (isItineraryEditMode) {
+                      <button
+                        type="button"
+                        class="btn-activity-delete"
+                        aria-label="Supprimer cette activité"
+                        title="Supprimer cette activité"
+                        [disabled]="isMovingActivity"
+                        (click)="openActivityDeleteModal(
+                          guide.id,
+                          day.id,
+                          activity.id,
+                          activity.title
+                        )">
+                        X
+                      </button>
+                    }
+
+                  </div>
+
+                  <p>{{ activity.description }}</p>
+
+                  <button
+                    type="button"
+                    class="btn-view-details"
+                    (click)="openActivityDetails(activity)">
+                    Voir les détails
+                  </button>
+
+                  <!-- custom preview displayed while dragging -->
+                  <ng-template cdkDragPreview>
+                    <div class="activity-drag-preview">
+                      {{ activity.title }}
+                    </div>
+                  </ng-template>
+
+                  <!-- placeholder showing the destination position -->
+                  <ng-template cdkDragPlaceholder>
+                    <div class="activity-drag-placeholder">
+                      Déposer ici
+                    </div>
+                  </ng-template>
+
+                </div>
+              }
+
+              @if (isItineraryEditMode) {
+                <button
+                  type="button"
+                  class="btn-add-activity"
+                  [disabled]="isMovingActivity"
+                  (click)="openActivityModal(day.id, day.activities)">
+                  + Ajouter une activité
+                </button>
+              }
+
+            </article>
+          } @empty {
+            <p>Aucun itinéraire n'a encore été ajouté.</p>
+          }
+
+        </div>
       </section>
+
+      @if (showActivityModal && selectedDayId !== null) {
+        <div class="modal-overlay activity-modal-overlay">
+          <section
+            class="activity-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="activity-modal-title">
+
+            <app-activity-form-admin
+              [guideId]="guide.id"
+              [dayId]="selectedDayId"
+              [visitOrder]="selectedVisitOrder"
+              (activityCreated)="onActivityCreated($event)"
+              (cancelled)="closeActivityModal()">
+            </app-activity-form-admin>
+
+          </section>
+        </div>
+      }
+
+      <!-- show activity details -->
+      @if (selectedActivityDetails) {
+        <div
+          class="modal-overlay"
+          (click)="closeActivityDetails()">
+
+          <section
+            class="activity-detail-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Détails de l'activité"
+            (click)="$event.stopPropagation()">
+
+            <app-activity-detail-admin
+              [activity]="selectedActivityDetails"
+              (closed)="closeActivityDetails()">
+            </app-activity-detail-admin>
+
+          </section>
+        </div>
+      }
 
       <!-- delete action, at the bottom of the detail page -->
       <section class="delete-section">
@@ -132,6 +266,57 @@
           Supprimer ce guide
         </button>
       </section>
+
+      <!-- activity deletion confirmation modal -->
+      @if (showActivityDeleteModal && selectedActivity) {
+        <div class="modal-overlay">
+          <section
+            class="confirmation-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="activity-delete-modal-title"
+            aria-describedby="activity-delete-modal-description">
+
+            <h2 id="activity-delete-modal-title">
+              Supprimer cette activité ?
+            </h2>
+
+            <p id="activity-delete-modal-description">
+              Voulez-vous vraiment supprimer l'activité
+              <strong>« {{ selectedActivity.title }} »</strong> ?
+
+              Cette action est définitive.
+            </p>
+
+            @if (activityDeleteErrorMessage) {
+              <p class="error-message" role="alert">
+                {{ activityDeleteErrorMessage }}
+              </p>
+            }
+
+            <div class="modal-actions">
+              <button
+                type="button"
+                class="btn-cancel"
+                [disabled]="isDeletingActivity"
+                (click)="closeActivityDeleteModal()">
+                Annuler
+              </button>
+
+              <button
+                type="button"
+                class="btn-confirm-delete"
+                [disabled]="isDeletingActivity"
+                (click)="deleteActivity()">
+                {{ isDeletingActivity
+                  ? 'Suppression...'
+                  : 'Supprimer' }}
+              </button>
+            </div>
+
+          </section>
+        </div>
+      }
       
       <!-- deletion confirmation modal -->
       @if (showDeleteModal) {

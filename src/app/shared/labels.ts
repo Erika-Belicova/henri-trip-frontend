@@ -36,3 +36,4 @@ export const CATEGORY_LABELS: Record<ActivityCategory, string> = {
 export const TRANSPORT_OPTIONS = Object.values(TransportOption);
 export const SEASON_OPTIONS = Object.values(SeasonOption);
 export const AUDIENCE_OPTIONS = Object.values(AudienceOption);
+export const CATEGORY_OPTIONS = Object.values(ActivityCategory);

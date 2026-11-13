@@ -1,0 +1,111 @@
+
+.activity-details {
+  padding: 1.5rem;
+  background: #fff;
+}
+
+.activity-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.activity-details-header h2 {
+  margin: 0;
+}
+
+.btn-close {
+  border: none;
+  background: transparent;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.activity-section {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.activity-section h3 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.activity-section > p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.information-item {
+  margin-bottom: 1rem;
+}
+
+.information-item:last-child {
+  margin-bottom: 0;
+}
+
+.information-item span {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.information-item p {
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.information-item a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.information-item a:hover {
+  text-decoration: underline;
+}
+
+.empty-value {
+  color: #888;
+  font-style: italic;
+}
+
+.activity-details-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.activity-details-footer button {
+  padding: 0.7rem 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font: inherit;
+}
+
+.activity-type-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.activity-details-header h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.activity-details-header h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #222;
+}
