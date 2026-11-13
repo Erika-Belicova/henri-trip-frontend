@@ -1,0 +1,173 @@
+<div class="detail-container">
+
+  <header class="detail-header">
+    <a routerLink="/guides">← Retour à mes guides</a>
+  </header>
+
+  @if (guideState$ | async; as state) {
+
+    @if (state.isLoading) {
+      <div class="empty-state">
+        <p>Chargement du guide...</p>
+      </div>
+    }
+
+    @if (state.errorMessage) {
+      <p class="error-message" role="alert">
+        {{ state.errorMessage }}
+      </p>
+
+      <a routerLink="/guides">
+        Retour à mes guides
+      </a>
+    }
+
+    @if (state.guide; as guide) {
+
+      <!-- guide header -->
+      <section class="guide-header">
+        <div>
+          <span class="section-eyebrow">VOTRE GUIDE DE VOYAGE</span>
+          <h1>{{ guide.title }}</h1>
+          <p>{{ guide.description }}</p>
+        </div>
+      </section>
+
+      <!-- guide information -->
+      <section class="guide-information">
+
+        <h2>Informations du guide</h2>
+
+        <p>
+          <strong>Durée :</strong>
+          {{ guide.numberOfDays }}
+          {{ guide.numberOfDays > 1 ? 'jours' : 'jour' }}
+        </p>
+
+        <div>
+          <strong>Mobilité :</strong>
+
+          @for (transport of guide.transports; track transport) {
+            <span class="option-tag">
+              {{ transportLabels[transport] }}
+            </span>
+          }
+        </div>
+
+        <div>
+          <strong>Saisons :</strong>
+
+          @for (season of guide.seasons; track season) {
+            <span class="option-tag">
+              {{ seasonLabels[season] }}
+            </span>
+          }
+        </div>
+
+        <div>
+          <strong>Pour qui :</strong>
+
+          @for (audience of guide.audiences; track audience) {
+            <span class="option-tag">
+              {{ audienceLabels[audience] }}
+            </span>
+          }
+        </div>
+
+      </section>
+
+      <!-- itinerary -->
+      <section class="itinerary">
+
+        <div class="itinerary-header">
+          <div>
+            <span class="section-eyebrow">VOTRE PROGRAMME</span>
+            <h2>Itinéraire</h2>
+          </div>
+        </div>
+
+        <div class="itinerary-days">
+
+          @for (day of guide.days; track day.id) {
+
+            <article class="day-card">
+
+              <h3>Jour {{ day.dayNumber }}</h3>
+
+              @if (day.activities.length === 0) {
+                <p class="empty-day-message">
+                  Aucune activité prévue pour cette journée.
+                </p>
+              }
+
+              @for (activity of day.activities; track activity.id) {
+
+                <div class="activity-card">
+
+                  <div class="activity-card-header">
+
+                    <div class="activity-title-container">
+
+                      <span class="activity-order">
+                        {{ activity.visitOrder }}.
+                      </span>
+
+                      <h4>{{ activity.title }}</h4>
+
+                    </div>
+
+                  </div>
+
+                  <p>{{ activity.description }}</p>
+
+                  <button
+                    type="button"
+                    class="btn-view-details"
+                    (click)="openActivityDetails(activity)">
+                    Voir les détails
+                  </button>
+
+                </div>
+
+              }
+
+            </article>
+
+          } @empty {
+            <div class="empty-state">
+              <p>Aucun itinéraire n'a encore été ajouté à ce guide.</p>
+            </div>
+          }
+
+        </div>
+
+      </section>
+
+      <!-- activity details -->
+      @if (selectedActivityDetails) {
+
+        <div
+          class="modal-overlay"
+          (click)="closeActivityDetails()">
+
+          <section
+            class="activity-detail-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Détails de l'activité"
+            (click)="$event.stopPropagation()">
+
+            <app-activity-detail-admin
+              [activity]="selectedActivityDetails"
+              (closed)="closeActivityDetails()">
+            </app-activity-detail-admin>
+
+          </section>
+
+        </div>
+
+      }
+    }
+  }
+
+</div>

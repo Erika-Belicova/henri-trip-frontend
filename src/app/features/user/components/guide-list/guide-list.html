@@ -1,4 +1,268 @@
-<section class="guide-list">
-  <h1>Mes guides</h1>
-  <p>Bienvenue sur Henri Trip.</p>
-</section>
+
+<div class="guides-container">
+
+  @if (guideListState$ | async; as state) {
+
+    <!-- welcome -->
+    <header class="guides-header">
+      <div>
+        <span class="header-eyebrow">BIENVENUE SUR HENRI TRIP</span>
+
+        <h1>Bienvenue dans votre espace voyage !</h1>
+
+        <p>
+          Retrouvez tous les guides qui ont été partagés avec vous
+          et préparez vos prochaines aventures.
+        </p>
+      </div>
+    </header>
+
+    <!-- statistics -->
+    <section class="statistics-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-eyebrow">VOTRE ESPACE</span>
+          <h2>Vue d'ensemble</h2>
+        </div>
+      </div>
+
+      <div class="statistics-grid">
+
+        <article class="stat-card">
+
+          <div class="stat-icon guide-icon">
+            <svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H20v17H5.5A2.5 2.5 0 0 1 3 17.5z"/>
+              <path d="M3 5.5v12M7 7h9M7 11h9M7 15h6"/>
+            </svg>
+          </div>
+
+          <div class="stat-content">
+            <span class="stat-label">Mes guides</span>
+
+            @if (state.isLoading) {
+              <span class="stat-value">...</span>
+            } @else {
+              <span class="stat-value">
+                {{ state.totalElements }}
+              </span>
+            }
+
+            <span class="stat-description">
+              Guides partagés avec vous
+            </span>
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    @if (state.errorMessage) {
+      <div class="error-message" role="alert">
+        {{ state.errorMessage }}
+
+        <button type="button" (click)="loadGuides()">
+          Réessayer
+        </button>
+      </div>
+    }
+
+    <!-- search and filters -->
+    <section class="filters-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-eyebrow">EXPLORATION</span>
+          <h2>Filtrer vos guides</h2>
+          <p>Recherchez et filtrez les guides qui ont été partagés avec vous selon vos préférences.</p>
+        </div>
+      </div>
+
+      <input
+        class="search-input"
+        type="search"
+        placeholder="Rechercher un guide..."
+        aria-label="Rechercher un guide"
+        [value]="searchQuery"
+        (input)="onSearch($event)"
+      />
+
+      <div class="filter-group">
+        <span class="filter-label">Mobilité</span>
+
+        @for (option of transportOptions; track option) {
+          <button
+            type="button"
+            class="btn-filter"
+            [class.active]="selectedTransports.has(option)"
+            [attr.aria-pressed]="selectedTransports.has(option)"
+            (click)="toggle(selectedTransports, option)">
+            {{ transportLabels[option] }}
+          </button>
+        }
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Saison</span>
+
+        @for (option of seasonOptions; track option) {
+          <button
+            type="button"
+            class="btn-filter"
+            [class.active]="selectedSeasons.has(option)"
+            [attr.aria-pressed]="selectedSeasons.has(option)"
+            (click)="toggle(selectedSeasons, option)">
+            {{ seasonLabels[option] }}
+          </button>
+        }
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Public</span>
+
+        @for (option of audienceOptions; track option) {
+          <button
+            type="button"
+            class="btn-filter"
+            [class.active]="selectedAudiences.has(option)"
+            [attr.aria-pressed]="selectedAudiences.has(option)"
+            (click)="toggle(selectedAudiences, option)">
+            {{ audienceLabels[option] }}
+          </button>
+        }
+      </div>
+
+      @if (hasFilters) {
+        <button
+          type="button"
+          class="clear-filters"
+          (click)="clearFilters()">
+          Effacer les filtres
+        </button>
+      }
+
+    </section>
+
+    <!-- guides -->
+    <section class="guides-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-eyebrow">VOTRE COLLECTION</span>
+          <h2>Vos guides de voyage</h2>
+        </div>
+
+        @if (!state.isLoading && !state.errorMessage) {
+          <span class="results-count">
+            {{ filteredGuides(state.guides).length }} résultat(s)
+          </span>
+        }
+      </div>
+
+      @if (state.isLoading) {
+        <div class="empty-state">
+          <p>Chargement de vos guides...</p>
+        </div>
+      }
+
+      @else if (!state.errorMessage && state.guides.length === 0) {
+        <div class="empty-state">
+
+          <h3>Votre collection est encore vide</h3>
+
+          <p>
+            Vous n'avez pas encore reçu de guide.
+            Lorsqu'un guide sera partagé avec vous,
+            il apparaîtra automatiquement ici.
+          </p>
+
+        </div>
+      }
+
+      @else if (!state.errorMessage) {
+
+        @let filtered = filteredGuides(state.guides);
+
+        @if (filtered.length === 0) {
+          <div class="empty-state">
+            <h3>Aucun résultat</h3>
+
+            <p>
+              Aucun guide ne correspond à vos critères de recherche.
+            </p>
+          </div>
+        }
+
+        @else {
+          <div class="guides-grid">
+
+            @for (guide of filtered; track guide.id) {
+              <article class="guide-card">
+
+                <div class="guide-card-top">
+                  <div class="guide-icon">
+                    <span aria-hidden="true">⌖</span>
+                  </div>
+
+                  <span class="guide-days">
+                    {{ guide.numberOfDays }} jours
+                  </span>
+                </div>
+
+                <h3>{{ guide.title }}</h3>
+
+                <p class="guide-description">
+                  {{ guide.description }}
+                </p>
+
+                <a
+                  [routerLink]="['/guides', guide.id]"
+                  class="guide-action">
+                  Découvrir le guide
+                  <span aria-hidden="true">→</span>
+                </a>
+
+              </article>
+            }
+
+          </div>
+        }
+
+      }
+
+      @if (!state.isLoading && !state.errorMessage && state.totalPages > 1) {
+        <nav class="pagination" aria-label="Pagination des guides">
+
+          <button
+            type="button"
+            class="pagination-button"
+            [disabled]="currentPage === 0"
+            (click)="previousPage()">
+            Précédent
+          </button>
+
+          <span>
+            Page {{ currentPage + 1 }} / {{ state.totalPages }}
+          </span>
+
+          <button
+            type="button"
+            class="pagination-button"
+            [disabled]="currentPage + 1 >= state.totalPages"
+            (click)="nextPage(state.totalPages)">
+            Suivant
+          </button>
+
+        </nav>
+      }
+
+    </section>
+
+  }
+
+</div>

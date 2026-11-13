@@ -3,9 +3,13 @@
 
   @if (authService.isAuthenticated()) {
     <nav class="session">
-      <a routerLink="/admin/guides">Gestion des guides</a>
 
-      <a routerLink="/admin/users">Gestion des utilisateurs</a>
+      @if (authService.getCurrentUser()?.role === 'ADMIN') {
+        <a routerLink="/admin/guides">Gestion des guides</a>
+        <a routerLink="/admin/users">Gestion des utilisateurs</a>
+      } @else {
+        <a routerLink="/guides">Mes guides</a>
+      }
 
       <span class="session-email">
         {{ authService.getCurrentUser()?.email }}
@@ -17,6 +21,7 @@
         (click)="authService.logout()">
         Déconnexion
       </button>
+
     </nav>
   }
 </header>

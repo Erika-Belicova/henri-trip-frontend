@@ -76,6 +76,13 @@ export const routes: Routes = [
         .then(m => m.GuideList),
     canActivate: [authGuard]
   },
+  {
+    path: 'guides/:id',
+    loadComponent: () =>
+      import('./features/user/components/guide-detail/guide-detail')
+        .then(m => m.GuideDetail),
+    canActivate: [authGuard]
+  },
 
   // not found
   {
